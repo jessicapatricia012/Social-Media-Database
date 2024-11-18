@@ -12,6 +12,20 @@
  * 
  */
 
+// This function initializes tables stated in CREATE_socialMedia.sql
+async function initializeTables() {
+    const response = await fetch("/initiate-tables", {
+        method: 'POST'
+    });
+    const responseData = await response.json();
+
+    if (responseData.success) {
+        const messageElement = document.getElementById('initTableResultMsg');
+        messageElement.textContent = "table initiated successfully!";
+    } else {
+        alert("Error initiating table!");
+    }
+}
 
 // This function checks the database connection and updates its status on the frontend.
 async function checkDbConnection() {
@@ -159,6 +173,7 @@ async function countDemotable() {
 // Initializes the webpage functionalities.
 // Add or remove event listeners based on the desired functionalities.
 window.onload = function() {
+    initializeTables();
     checkDbConnection();
     fetchTableData();
     document.getElementById("resetDemotable").addEventListener("click", resetDemotable);
