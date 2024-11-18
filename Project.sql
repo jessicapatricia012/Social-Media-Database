@@ -1,137 +1,160 @@
-CREATE TABLE User (
-	username	VARCHAR(20) 	PRIMARY KEY,
-	email	VARCHAR(20)	NOT NULL,
+CREATE TABLE Person (
+	username	VARCHAR(50) 	PRIMARY KEY,
+	email	VARCHAR(50)	NOT NULL,
 	dateJoined	DATE	NOT NULL,
-	displayName	VARCHAR(20),
+	displayName	VARCHAR(50),
 	UNIQUE (email)
 );
+
 CREATE TABLE Community (
-	communityName	VARCHAR(20)	PRIMARY KEY,
-	rule	TEXT,
-	description	TEXT		
+	communityName	VARCHAR(50)	PRIMARY KEY,
+	rule	LONG,
+	description	VARCHAR(1000)	
 );
-CREATE TABLE EntryCreatedBy (
+
+CREATE TABLE EntryCreatedBy(
 	entryID	INTEGER	PRIMARY KEY,
 	dateCreated	DATE,
-	content	TEXT,
-	username	VARCHAR(20)		
+	content	LONG,
+	username VARCHAR(50) REFERENCES Person(username)		
 );
+
 CREATE TABLE PostIn (
 	entryID	INTEGER	PRIMARY KEY,
-	title	TEXT	NOT NULL,
-	communityName	VARCHAR(20)	NOT NULL,
-	FOREIGN KEY (communityName) REFERENCES EntryCreatedByIn,
-	FOREIGN KEY (communityName) REFERENCES Community,
+	title	VARCHAR(1000)	NOT NULL,
+	communityName	VARCHAR(50)	NOT NULL,
+	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy(entryID),
+	FOREIGN KEY (communityName) REFERENCES Community(communityName)
 );
+
 CREATE TABLE CommentOn (
-	entryID	INETEGER	PRIMARY KEY,
+	entryID	INTEGER	PRIMARY KEY,
 	onEntryID	INTEGER	NOT NULL,
-	FOREIGN KEY (onEntryID) REFERENCES EntryCreatedByIn,
-	FOREIGN KEY (entryID) REFERENCES EntryCreatedByIn
+	FOREIGN KEY (onEntryID) REFERENCES EntryCreatedBy(entryID),
+	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy(entryID)
 );
  
-CREATE TABLE MessageSentByIn (
-	messageID	INETEGER	PRIMARY KEY,
-	dateSent	DATE	NOT NULL,
-	content	TEXT	NOT NULL,
-	username	VARCHAR(20)	NOT NULL,
-	chatroomID	INETEGER	NOT NULL,
-	FOREIGN KEY (chatroomID) REFERENCES chatRoom,
-	FOREIGN KEY (username) REFERENCES User	
-);
-CREATE TABLE ChatRoom (
+CREATE TABLE Chatroom (
 	chatroomID	INTEGER	PRIMARY KEY,
-	name	VARCHAR(20)
+	name	VARCHAR(50)
 );
-CREATE TABLE JoinsChatRoom (
+
+CREATE TABLE MessageSentByIn (
+	messageID	INTEGER	PRIMARY KEY,
+	dateSent	DATE	NOT NULL,
+	content	LONG	NOT NULL,
+	username	VARCHAR(50)	NOT NULL,
+	chatroomID	INTEGER	NOT NULL,
+	FOREIGN KEY (chatroomID) REFERENCES Chatroom(chatroomID),
+	FOREIGN KEY (username) REFERENCES Person(username)	
+);
+
+CREATE TABLE JoinsChatroom (
 	chatroomID	INTEGER,
-	username	VARCHAR(20),
+	username	VARCHAR(50),
 	PRIMARY KEY (chatroomID, username),
-	FOREIGN KEY (chatroomID) REFERENCES chatRoom,
-	FOREIGN KEY (username) REFERENCES User,
+	FOREIGN KEY (chatroomID) REFERENCES Chatroom(chatroomID),
+	FOREIGN KEY (username) REFERENCES Person(username)
 );
+
+-- CREATE ASSERTION ChatroomJoined
+-- CHECK 
+-- (NOT EXISTS ((SELECT chatroomID FROM Chatroom)
+-- 			EXCEPT
+-- 			(SELECT chatroomID FROM JoinsChatroom)));
+
 CREATE TABLE Award (
 	awardType	VARCHAR(10)	 PRIMARY KEY,
 	value	INTEGER	NOT NULL
 );
+
 CREATE TABLE GivenToBy (
-	awardType	INETEGER	NOT NULL,
-	username	VARCHAR(20),
-	entryID	INETEGER,
+	awardType	VARCHAR(10)	NOT NULL,
+	username	VARCHAR(50),
+	entryID	INTEGER,
 	PRIMARY KEY (awardType, username, entryID),
-	FOREIGN KEY (awardType) REFERENCES award,
-	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy,
-	FOREIGN KEY (username) REFERENCES User,
+	FOREIGN KEY (awardType) REFERENCES Award(awardType),
+	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy(entryID),
+	FOREIGN KEY (username) REFERENCES Person(username)
 );
- 
+
+
 CREATE TABLE Follows(
-	followingUsername	VARCHAR(20),
-	followedUsername 	VARCHAR(20)
-	PRIMARY KEY(followingUsername, followedUsername),
-	FOREIGN KEY (followingUsername) REFERENCES User,
-	FOREIGN KEY (followedUsername) REFERENCES User,
+	followingUsername	VARCHAR(50),
+	followedUsername 	VARCHAR(50),
+	PRIMARY KEY (followingUsername, followedUsername),
+	FOREIGN KEY (followingUsername) REFERENCES Person(username),
+	FOREIGN KEY (followedUsername) REFERENCES Person(username)
 );
 
 CREATE TABLE Vote (
-	username	VARCHAR(20),
+	username	VARCHAR(50),
 	entryID	INTEGER,
-	upvoteOrDownvote	BOOLEAN,
+	upvoteOrDownvote	INTEGER,
 	PRIMARY KEY(username, entryID),
-	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy,
-	FOREIGN KEY (username) REFERENCES User,
+	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy(entryID),
+	FOREIGN KEY (username) REFERENCES Person(username)
 );
 
 CREATE TABLE JoinsCommunity(
-	username	VARCHAR(20),
-	communityName	VARCHAR(20),
+	username	VARCHAR(50),
+	communityName	VARCHAR(50),
 	PRIMARY KEY (username, communityName),
-	FOREIGN KEY (communityName) REFERENCES Community,
-	FOREIGN KEY (username) REFERENCES User,
+	FOREIGN KEY (communityName) REFERENCES Community(CommunityName),
+	FOREIGN KEY (username) REFERENCES Person(username)
 );
-CREATE TABLE ImageContainedBy1(
-	imageFile	MEDIUMBLOB 	PRIMARY KEY,
-	width	INTEGER
-);
-CREATE TABLE ImageContainedBy3(
-	imageFile	MEDIUMBLOB 	PRIMARY KEY,
-	height	INTEGER
-);
-CREATE TABLE ImageContainedBy5(
-	imageFile	MEDIUMBLOB 	PRIMARY KEY,
-	size	INTEGER
-);
+
+-- CREATE TABLE ImageContainedBy1(
+-- 	imageFile	LONG RAW 	PRIMARY KEY,
+-- 	width	INTEGER
+-- );
+
+-- CREATE TABLE ImageContainedBy3(
+-- 	imageFile	LONG RAW 	PRIMARY KEY,
+-- 	height	INTEGER
+-- );
+
+-- CREATE TABLE ImageContainedBy5(
+-- 	imageFile	LONG RAW 	PRIMARY KEY,
+-- 	imageSize	INTEGER
+-- );
  
 CREATE TABLE ImageContainedBy6(
 	AttachmentID	INTEGER 	PRIMARY KEY,
-	imageFile	MEDIUMBLOB	NOT NULL,
+	imageFile	LONG RAW	NOT NULL,
 	entryID	INTEGER,
-	messageID	INETEGER,
-	FOREIGN KEY (entryID) REFERENCES PostIn,
-	FOREIGN KEY (messageID) REFERENCED MessageSentByIn
+	messageID	INTEGER,
+	FOREIGN KEY (entryID) REFERENCES PostIn(entryID),
+	FOREIGN KEY (messageID) REFERENCES MessageSentByIn(messageID)
 );
-CREATE TABLE VideoContainedBy1 (
-	videoFile	LARGEBLOB 	PRIMARY KEY,
-	width	INTEGER
-);
-CREATE TABLE VideoContainedBy3 (
-	videoFile	LARGEBLOB 	PRIMARY KEY,
-	height	INTEGER
-);
-CREATE TABLE VideoContainedBy5 (
-	videoFile	LARGEBLOB 	PRIMARY KEY,
-	size	INTEGER
-);
-CREATE TABLE VideoContainedBy7 (
-	videoFile	LARGEBLOB 	PRIMARY KEY,
-	duration	TIME
-);
+
+-- CREATE TABLE VideoContainedBy1 (
+-- 	videoFile	LONG RAW 	PRIMARY KEY,
+-- 	width	INTEGER
+-- );
+
+-- CREATE TABLE VideoContainedBy3 (
+-- 	videoFile	LONG RAW 	PRIMARY KEY,
+-- 	height	INTEGER
+-- );
+
+-- CREATE TABLE VideoContainedBy5 (
+-- 	videoFile	LONG RAW 	PRIMARY KEY,
+-- 	imageSize	INTEGER
+-- );
+
+-- CREATE TABLE VideoContainedBy7 (
+-- 	videoFile	LONG RAW 	PRIMARY KEY,
+-- 	duration	INTEGER
+-- );
+
 CREATE TABLE VideoContainedBy8(
 	attachmentID	INTEGER 	PRIMARY KEY,
-	videoFile	LARGEBLOB	NOT NULL,
+	videoFile	LONG RAW	NOT NULL,
 	entryID	INTEGER,
-	messageID	INETEGER,
-	FOREIGN KEY (entryID) REFERENCES PostIn,
-	FOREIGN KEY (messageID) REFERENCED MessageSentByIn
+	messageID	INTEGER,
+	FOREIGN KEY (entryID) REFERENCES PostIn(entryID),
+	FOREIGN KEY (messageID) REFERENCES MessageSentByIn(messageID)
 );
 
 
