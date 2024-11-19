@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Link to the external CSS stylesheet. Uncomment if you wish to customize or add styling. -->
-    <!-- <link rel="stylesheet" href="styles.css">   -->
+    <link rel="stylesheet" href="styles.css">
 
     <title>Database Application</title>
 </head>
@@ -15,12 +15,14 @@
     <!-- Display the current status of the database connection. 
          !!HERE TO HELP U DEBUGGING, NOT REQUIRED IN YOUR OWN PROJECT!!
          -->
-    <h1>Database Connection Status: 
+    <h1>Social Media Database</h1>
+
+    <h3>Database Connection Status:
         <!-- An in-line placeholder to display connection status. -->
         <span id="dbStatus"> </span>
         <!-- A loading GIF, will be hided once get the status. -->
         <img id="loadingGif" class="loading-gif" src="loading_100px.gif" alt="Loading...">
-    </h1>
+    </h3>
 
     <br><hr><br> <!-- ========================================================================= -->
 
@@ -40,6 +42,30 @@
     </table>
 
     <br><hr><br> <!-- ========================================================================= -->
+    <!-- Show 'all tables '.
+       Data will be fetched and inserted here dynamically using JavaScript. -->
+    <h2>Tables</h2>
+    <div id="tablesContainer">
+        <table id="tables">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+
+    <br><hr><br> <!-- ========================================================================= -->
+    <div class="dropdown">
+        <button id="dropdownButton">Select Tables</button>
+        <ul id="dropdownMenu" class="dropdown-menu">
+            <!-- Options will be dynamically populated -->
+        </ul>
+        <button id="selectButton">Submit</button>
+    </div>
+    <p>Selected Tables: <span id="selectedOptions">None</span></p>
+    <!-- Tables will be placed here or above later-->
+
+
+    <br><hr><br> <!-- ========================================================================= -->
 
     <h2>Reset Demotable</h2>
     <p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you MUST use reset</p>
@@ -51,7 +77,7 @@
 
     <h2>Initialize tables</h2>
     <p>Initialize Tables.</p>
-    <button id="InitTable"> intialize </button> <br>
+    <button id="initTable"> intialize </button> <br>
     <div id="initTableResultMsg"></div>
 
     <br><hr><br> <!-- ========================================================================= -->

@@ -85,6 +85,17 @@ async function fetchDemotableFromDb() {
     });
 }
 
+async function fetchTableFromDb(table) {
+    return await withOracleDB(async (connection) => {
+        const sql = `SELECT * FROM ${table}`;
+        const result = await connection.execute(sql);
+        return result.rows;
+    }).catch((err) => {
+        console.error(err);
+        return [];
+    });
+}
+
 async function initiateTables() {
     const map = new Map;
     map.set('USERS', `
@@ -380,5 +391,6 @@ module.exports = {
     insertDemotable, 
     updateNameDemotable, 
     countDemotable,
-    initiateTables
+    initiateTables,
+    fetchTableFromDb
 };

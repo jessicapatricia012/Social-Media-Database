@@ -20,6 +20,21 @@ router.get('/demotable', async (req, res) => {
     res.json({data: tableContent});
 });
 
+router.get('/table/:name', async (req, res) => {
+    const tableName = req.params.name;
+
+    if (!tableName) {
+        return res.status(400).json({ error: 'Table name is required' });
+    }
+
+    try {
+        const tableContent = await appService.fetchTableFromDb(tableName);
+        res.json({ data: tableContent });
+    } catch (err) {
+        res.status(500).json({ error: 'Error fetching table data' });
+    }
+});
+
 router.post("/initiate-demotable", async (req, res) => {
     const initiateResult = await appService.initiateDemotable();
     if (initiateResult) {
