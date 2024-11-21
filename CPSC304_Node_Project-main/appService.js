@@ -48,7 +48,7 @@ process
 async function withOracleDB(action) {
     let connection;
     try {
-        connection = await oracledb.getConnection(); // Gets a connection from the default pool 
+        connection = await oracledb.getConnection(); // Gets a connection from the default pool
         return await action(connection);
     } catch (err) {
         console.error(err);
@@ -89,241 +89,72 @@ async function fetchTableFromDb(table) {
     return await withOracleDB(async (connection) => {
         const sql = `SELECT * FROM ${table}`;
         const result = await connection.execute(sql);
-        return result.rows;
+        return result;
     }).catch((err) => {
         console.error(err);
         return [];
     });
 }
 
-async function initiateTables() {
-    const map = new Map;
-    map.set('USERS', `
-    CREATE TABLE users (
-        username VARCHAR(20) PRIMARY KEY,
-        email VARCHAR(20) NOT NULL,
-        dateJoined DATE NOT NULL,
-        displayName VARCHAR(20),
-        followingUsername VARCHAR(20),
-        followedUsername VARCHAR(20),
-        UNIQUE (email)
-    )
-`);
-    map.set('COMMUNITIES', `
-        CREATE TABLE communities (
-                                     communityName VARCHAR(20) PRIMARY KEY,
-                                     rule VARCHAR2(1000), -- Up to 4000 characters
-                                     description VARCHAR(250)
-        )
-`);
-    map.set('ENTRYCREATEDBY', `
-        CREATE TABLE entryCreatedBy (
-                                        entryID INTEGER PRIMARY KEY,
-                                        dateCreated DATE,
-                                        content VARCHAR2(1000),
-                                        username VARCHAR(20)
-        )
-        `);
-    map.set('POSTIN', `
-        CREATE TABLE postIn (
-                                entryID INTEGER PRIMARY KEY,
-                                title VARCHAR2(100) NOT NULL,
-                                communityName VARCHAR(20) NOT NULL,
-                                FOREIGN KEY (communityName) REFERENCES communities(communityName),
-                                FOREIGN KEY (entryID) REFERENCES entryCreatedBy(entryID)
-        )
-        `);
-    map.set('COMMENTON', `
-        CREATE TABLE commentOn (
-                                   entryID INTEGER PRIMARY KEY,
-                                   onEntryID INTEGER NOT NULL,
-                                   FOREIGN KEY (onEntryID) REFERENCES entryCreatedBy(entryID),
-                                   FOREIGN KEY (entryID) REFERENCES entryCreatedBy(entryID)
-        );
-        `);
-    map.set('CHATROOM', `
-        CREATE TABLE chatRoom (
-                                  chatroomID INTEGER PRIMARY KEY,
-                                  name VARCHAR(20)
-        )
-        `);
-    map.set('MESSAGESENTBYIN', `
-        CREATE TABLE messageSentByIn (
-                                         messageID INTEGER PRIMARY KEY,
-                                         dateSent DATE NOT NULL,
-                                         content VARCHAR2(1000) NOT NULL,
-                                         username VARCHAR(20) NOT NULL,
-                                         chatroomID INTEGER NOT NULL,
-                                         FOREIGN KEY (chatroomID) REFERENCES chatRoom,
-                                         FOREIGN KEY (username) REFERENCES users(username)
-        )
-        `);
-    map.set('JOINSCHATROOM', `
-        CREATE TABLE joinsChatRoom (
-                                       chatroomID INTEGER,
-                                       username VARCHAR(20),
-                                       PRIMARY KEY (chatroomID, username),
-                                       FOREIGN KEY (chatroomID) REFERENCES chatRoom,
-                                       FOREIGN KEY (username) REFERENCES users(username)
-        )
-        `);
-    map.set('GIVENTOBY', `
-        CREATE TABLE givenToBy (
-                                   awardType VARCHAR(10) NOT NULL,
-                                   username VARCHAR(20),
-                                   entryID INTEGER,
-                                   PRIMARY KEY (awardType, username, entryID),
-                                   FOREIGN KEY (awardType) REFERENCES awards(awardType),
-                                   FOREIGN KEY (entryID) REFERENCES EntryCreatedBy,
-                                   FOREIGN KEY (username) REFERENCES users(username)
-        )
-        `);
-    map.set('FOLLOWS', `
-        CREATE TABLE follows (
-                                 followingUsername  VARCHAR(20),
-                                 followedUsername   VARCHAR(20),
-                                 PRIMARY KEY(followingUsername, followedUsername),
-                                 FOREIGN KEY (followingUsername) REFERENCES users(username),
-                                 FOREIGN KEY (followedUsername) REFERENCES users(username)
-        )
-        `);
-    map.set('VOTE', `
-        CREATE TABLE vote (
-                              username VARCHAR(20),
-                              entryID INTEGER,
-                              upvoteOrDownvote NUMBER(1),
-                              PRIMARY KEY(username, entryID),
-                              FOREIGN KEY (entryID) REFERENCES EntryCreatedBy,
-                              FOREIGN KEY (username) REFERENCES users(username)
-        )
-        `);
-    map.set('JOINSCOMMUNITY', `
-        CREATE TABLE joinsCommunity(
-                                       username VARCHAR(20),
-                                       communityName VARCHAR(20),
-                                       PRIMARY KEY (username, communityName),
-                                       FOREIGN KEY (communityName) REFERENCES communities(communityName),
-                                       FOREIGN KEY (username) REFERENCES users(username)
-        )
-        `);
-    map.set('IMAGECONTAINEDBY1', `
-        CREATE TABLE imageContainedBy1 (
-                                           imageID INTEGER PRIMARY KEY,
-                                           imageFile BLOB,
-                                           width INTEGER
-        )
-        `);
-    map.set('IMAGECONTAINEDBY3', `
-        CREATE TABLE imageContainedBy3(
-                                          imageID INTEGER PRIMARY KEY,
-                                          imageFile BLOB,
-                                          height INTEGER
-        )
-        `);
-    map.set('IMAGECONTAINEDBY5', `
-        CREATE TABLE imageContainedBy5(
-                                          imageID INTEGER PRIMARY KEY,
-                                          imageFile BLOB,
-                                          imageSize INTEGER
-        )
-        `);
-    map.set('IMAGECONTAINEDBY6', `
-        CREATE TABLE imageContainedBy6(
-                                          AttachmentID INTEGER  PRIMARY KEY,
-                                          imageFile BLOB NOT NULL,
-                                          entryID INTEGER,
-                                          messageID INTEGER,
-                                          FOREIGN KEY (entryID) REFERENCES PostIn,
-                                          FOREIGN KEY (messageID) REFERENCES MessageSentByIn
-        )
-        `);
-    map.set('VIDEOCONTAINEDBY1', `
-        CREATE TABLE videoContainedBy1 (
-                                           videoID INTEGER PRIMARY KEY,
-                                           videoFile BLOB,
-                                           width INTEGER
-        )
-        `);
-    map.set('VIDEOCONTAINEDBY3', `
-        CREATE TABLE videoContainedBy3 (
-                                           videoID INTEGER PRIMARY KEY,
-                                           videoFile BLOB,
-                                           height INTEGER
-        )
-        `);
-    map.set('VIDEOCONTAINEDBY5', `
-        CREATE TABLE videoContainedBy5 (
-                                           videoID INTEGER PRIMARY KEY,
-                                           videoFile BLOB,
-                                           videoSize INTEGER
-        )
-        `);
-    map.set('VIDEOCONTAINEDBY7', `
-        CREATE TABLE videoContainedBy7 (
-                                           videoID INTEGER PRIMARY KEY,
-                                           videoFile BLOB,
-                                           duration INTEGER
-        )
-        `);
-    map.set('IMAGECONTAINEDBY8', `
-        CREATE TABLE videoContainedBy8(
-                                          attachmentID INTEGER  PRIMARY KEY,
-                                          videoFile BLOB NOT NULL,
-                                          entryID INTEGER,
-                                          messageID INTEGER,
-                                          FOREIGN KEY (entryID) REFERENCES PostIn,
-                                          FOREIGN KEY (messageID) REFERENCES MessageSentByIn
-        )
-        `);
-
-    try {
-        await initMap(map);
-        return true;
-    } catch (err) {
-        return false;
-    }
-}
-async function initMap(map) {
+async function initializeCreateTables() {
     return await withOracleDB(async (connection) => {
-        for (const [tableName, createTableSQL] of map) {
-            try {
-                console.log(`Dropping table: ${tableName}`);
-                await connection.execute(`DROP TABLE ${tableName}`);
-            } catch (err) {
-                console.log(`Table ${tableName} might not exist, proceeding to create...`);
-            }
+        const fs = require('fs');
+        const sqlScript = fs.readFileSync('./CREATE_tables.sql', 'utf-8');
 
-            try {
-                console.log(`Creating table: ${tableName}`);
-                await connection.execute(createTableSQL);
-            } catch (err) {
-                console.error(`Failed to create table ${tableName}:`, err.message);
-                throw err; // Optionally rethrow to stop the loop if creation fails
+        // Split the SQL commands and process them
+        const sqlStatements = sqlScript.split(';').map(command => command.trim()).filter(command => command);
+
+        try {
+            for (const statement of sqlStatements) {
+                if (statement) {
+                    try {
+                        const result = await connection.execute(statement);
+                        await connection.execute('COMMIT');
+                    } catch (error) {
+                        // If tables doesn't exist, we skip and move on to next command
+                        if (error.errorNum === 942) {
+                            console.warn(`Warning: Table does not exist. Moving on...`);
+                        } else {
+                            console.log("Error has occurred: ", error.errorNum);
+                            throw error;
+                        }
+                    }
+                }
             }
+            console.log('INIT: SQL script executed successfully.');
+            return true;
+        } catch (error) {
+            console.error('INIT: Error executing SQL script:', error);
+            return false;
         }
-        return true;
-    }).catch((err) => {
-        console.error("Error during table initialization:", err.message);
-        return false;
     });
 }
-async function initAwards() {
-    return await withOracleDB(async (connection) => {
-        try {
-            await connection.execute(`DROP TABLE AWARDS`);
-        } catch(err) {
-            console.log('table might not exist, proceeding to create...');
-        }
 
-        const result = await connection.execute(`
-            CREATE TABLE awards (
-                                    awardType VARCHAR(10)  PRIMARY KEY,
-                                    value INTEGER NOT NULL
-            )
-        `);
-        return true;
-    }).catch(() => {
-        return false;
+async function insertTables() {
+    return await withOracleDB(async (connection) => {
+        const fs = require('fs');
+        const sqlScript = fs.readFileSync('./INSERT_tables.sql', 'utf-8');
+
+        // Split the SQL commands and process them
+        const sqlStatements = sqlScript.split(';').map(command => command.trim()).filter(command => command);
+
+        try {
+            for (const statement of sqlStatements) {
+                if (statement) {
+                    try {
+                        const result = await connection.execute(statement);
+                        await connection.execute('COMMIT');
+                    } catch (error) {
+                        throw error;
+                    }
+                }
+            }
+            console.log('INSERT: SQL script executed successfully.');
+            return true;
+        } catch (error) {
+            console.error('Error executing SQL script:', error);
+            return false;
+        }
     });
 }
 
@@ -391,6 +222,7 @@ module.exports = {
     insertDemotable, 
     updateNameDemotable, 
     countDemotable,
-    initiateTables,
+    initializeCreateTables,
+    insertTables,
     fetchTableFromDb
 };

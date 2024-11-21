@@ -12,9 +12,15 @@
  * 
  */
 
-// This function initializes tables stated in CREATE_socialMedia.sql
+async function initializeAndInsertTables() {
+    await initializeTables();
+    await insertTables();
+}
+
+// This function initializes tables stated in CREATE_tables.sql
 async function initializeTables() {
-    const response = await fetch("/initiate-tables", {
+
+    const response = await fetch("/initiate_create_table", {
         method: 'POST'
     });
     const responseData = await response.json();
@@ -24,6 +30,23 @@ async function initializeTables() {
         messageElement.textContent = "table initiated successfully!";
     } else {
         alert("Error initiating table!");
+    }
+}
+
+
+// This function inserts tables stated in INSERT_tables.sql
+async function insertTables() {
+
+    const response = await fetch("/insert_table", {
+        method: 'POST'
+    });
+    const responseData = await response.json();
+
+    if (responseData.success) {
+        const messageElement = document.getElementById('insertTableResultMsg');
+        messageElement.textContent = "inserted values successfully!";
+    } else {
+        alert("Error inserting table!");
     }
 }
 
@@ -81,59 +104,61 @@ async function fetchAndDisplayUsers() {
 // Fetches data from the table and displays it.
 async function fetchAndDisplayUsers2() {
     const content = [];
-    const tableElement = document.getElementById('tables');
-    const tableBody = tableElement.querySelector('tbody');
+    const tablesContainer = document.getElementById('tablesContainer');
 
+    // Clear the entire container before new fetching process
+    if (tablesContainer) {
+        tablesContainer.innerHTML = '';
+    } else {
+        console.error("Tables container not found");
+        return;
+    }
+
+    // Continue with fetching and displaying the data
     for (const option of selectedOptions) {
         let sql = "";
-        // will need to fix this later
         if (option == 'image') {
             sql = `/table/imagecontainedby1`;
         } else if (option == 'video') {
             sql = `/table/videocontainedby1`;
         } else {
-            sql= `/table/${option}`;
+            sql = `/table/${option}`;
         }
 
         try {
+            console.log('SCRIPT-FETCH: fetching all users', sql);
             const response = await fetch(sql, { method: 'GET' });
             const responseData = await response.json();
 
             if (responseData && responseData.data) {
-                content.push(responseData.data);
+                const metaData = responseData.data.metaData;
+                const rows = responseData.data.rows;
+                content.push({ metaData, rows, tableTitle: option });
             }
         } catch (err) {
             console.error('Error fetching table data:', err);
         }
     }
 
-    // Always clear old data before new fetching process.
-    if (tableBody) {
-        tableBody.innerHTML = '';
-    }
+    // After clearing, create new tables with the data fetched
+    content.forEach(data => {
+        const { metaData, rows, tableTitle } = data;
 
-    for (let table of content) {
-        // Loop through all keys in the table object (e.g., "Awards", "People")
-        for (let tableName in table) {
-            if (table.hasOwnProperty(tableName)) {
-                const tableData = table[tableName];
-                console.log(tableName, tableData); // Logs the table name and its data
-                createTable(tableName, tableData); // Dynamically pass the table name and data
-            }
-        }
-    }
+        // Create the table using your createTable function
+        createTable(metaData, rows, tableTitle);
+    });
 }
 
+
+
 // Function to dynamically create a table for a given table name and its data
-function createTable(tableName, tableData) {
+function createTable(metaData, tableData, tableTitle) {
     const tablesContainer = document.getElementById('tablesContainer');
 
-    // Create a heading element for the table name
-    const heading = document.createElement('h3');
-    heading.innerText = tableName; // Set the text of the heading to the table name
-
-    // Add the heading above the table
-    tablesContainer.appendChild(heading);
+    // Create a header for the table (e.g., a <h3> with the table's title)
+    const tableHeader = document.createElement('h3');
+    tableHeader.innerText = tableTitle;
+    tablesContainer.appendChild(tableHeader);
 
     // Create the table element
     const table = document.createElement('table');
@@ -143,19 +168,19 @@ function createTable(tableName, tableData) {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
 
-    // If there's data, create table headers based on columns in the table data
-    if (tableData.length > 0) {
-        Object.keys(tableData[0]).forEach((key) => {
+    // Create table headers based on columns in the metaData
+    if (Array.isArray(metaData) && metaData.length > 0) {
+        metaData.forEach((item) => {
             const th = document.createElement('th');
-            th.innerText = key;  // Use the key as the column name (header)
+            th.innerText = item.name; // Use 'name' property from metaData for column name
             headerRow.appendChild(th);
         });
         thead.appendChild(headerRow);
     } else {
-        // If no data, add a header row indicating no data is available
+        // If no metaData, add a header row indicating no data
         const th = document.createElement('th');
         th.colSpan = 100;  // Span across all columns
-        th.innerText = 'No Available Data';  // Display message in the header row
+        th.innerText = 'No Available Data';
         headerRow.appendChild(th);
         thead.appendChild(headerRow);
     }
@@ -165,22 +190,23 @@ function createTable(tableName, tableData) {
     const tbody = document.createElement('tbody');
 
     // If there is data, create rows
-    if (tableData.length > 0) {
+    if (Array.isArray(tableData) && tableData.length > 0) {
         tableData.forEach((row) => {
             const tr = document.createElement('tr');
-            Object.values(row).forEach((value) => {
+            row.forEach((value) => {
                 const td = document.createElement('td');
-                td.innerText = value;
+                // Check if value is null or undefined, replace with 'Empty'
+                td.innerText = (value === null || value === undefined) ? 'Empty' : value;
                 tr.appendChild(td);
             });
             tbody.appendChild(tr);
         });
     } else {
-        // If no data, add a row with a message indicating no data available
+        // If no rows, add a row with a message indicating no data available
         const tr = document.createElement('tr');
         const td = document.createElement('td');
-        td.colSpan = 100;  // Span across all columns
-        td.innerText = 'No Data Available';  // Message for empty table
+        td.colSpan = metaData.length;  // Span across all columns
+        td.innerText = 'No Data Available';
         tr.appendChild(td);
         tbody.appendChild(tr);
     }
@@ -190,7 +216,6 @@ function createTable(tableName, tableData) {
     // Add the table to the container
     tablesContainer.appendChild(table);
 }
-
 
 // Inserts new records into the demotable.
 async function insertDemotable(event) {
@@ -336,13 +361,13 @@ populateDropdown(options);
 // Initializes the webpage functionalities.
 // Add or remove event listeners based on the desired functionalities.
 window.onload = function() {
-    initializeTables();
+    initializeAndInsertTables();
     checkDbConnection();
     fetchTableData();
     fetchTableData2();
     document.getElementById("selectButton").addEventListener("click", fetchTableData2);
     document.getElementById("resetDemotable").addEventListener("click", resetDemotable);
-    document.getElementById("initTable").addEventListener("click", initializeTables);
+    document.getElementById("initTable").addEventListener("click", initializeAndInsertTables);
     document.getElementById("insertDemotable").addEventListener("submit", insertDemotable);
     document.getElementById("updataNameDemotable").addEventListener("submit", updateNameDemotable);
     document.getElementById("countDemotable").addEventListener("click", countDemotable);
