@@ -15,13 +15,57 @@ router.get('/check-db-connection', async (req, res) => {
     }
 });
 
+
+// Execute the SQL file and create tables
+router.post("/initiate_create_table", async (req, res) => {
+    const initiateResult = await appService.initializeCreateTables();
+    if (initiateResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+});
+
+router.post("/insert_table", async (req, res) => {
+    const initiateResult = await appService.insertTables();
+    if (initiateResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+});
+
 router.get('/demotable', async (req, res) => {
     const tableContent = await appService.fetchDemotableFromDb();
     res.json({data: tableContent});
 });
 
+router.get('/table/:name', async (req, res) => {
+    const tableName = req.params.name;
+
+    if (!tableName) {
+        return res.status(400).json({ error: 'Table name is required' });
+    }
+
+    try {
+        const tableContent = await appService.fetchTableFromDb(tableName);
+        res.json({ data: tableContent});
+    } catch (err) {
+        res.status(500).json({ error: 'Error fetching table data' });
+    }
+});
+
 router.post("/initiate-demotable", async (req, res) => {
     const initiateResult = await appService.initiateDemotable();
+    if (initiateResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+});
+
+router.post("/initiate-tables", async (req, res) => {
+    const initiateResult = await appService.initiateTables();
     if (initiateResult) {
         res.json({ success: true });
     } else {

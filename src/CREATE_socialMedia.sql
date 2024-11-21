@@ -28,14 +28,14 @@ CREATE TABLE postIn (
 ); 
 
 CREATE TABLE commentOn ( 
- entryID INETEGER PRIMARY KEY, 
+ entryID INTEGER PRIMARY KEY,
  onEntryID INTEGER NOT NULL, 
  FOREIGN KEY (onEntryID) REFERENCES EntryCreatedByIn, 
  FOREIGN KEY (entryID) REFERENCES EntryCreatedByIn 
 ); 
     
 CREATE TABLE messageSentByIn ( 
- messageID INETEGER PRIMARY KEY, 
+ messageID INTEGER PRIMARY KEY,
  dateSent DATE NOT NULL, 
  content TEXT NOT NULL, 
  username VARCHAR(20) NOT NULL, 
@@ -118,7 +118,7 @@ CREATE TABLE imageContainedBy6(
  entryID INTEGER, 
  messageID INETEGER, 
  FOREIGN KEY (entryID) REFERENCES PostIn, 
- FOREIGN KEY (messageID) REFERENCED MessageSentByIn 
+ FOREIGN KEY (messageID) REFERENCES MessageSentByIn
 ); 
 
 CREATE TABLE videoContainedBy1 ( 
@@ -147,5 +147,5 @@ CREATE TABLE videoContainedBy8(
  entryID INTEGER, 
  messageID INETEGER, 
  FOREIGN KEY (entryID) REFERENCES PostIn, 
- FOREIGN KEY (messageID) REFERENCED MessageSentByIn 
+ FOREIGN KEY (messageID) REFERENCES MessageSentByIn
 );

@@ -5,7 +5,7 @@ body {
     max-width: 800px;
     margin: auto;
     line-height: 1.6;
-    background-color: #fffef5f9;
+    background-color: #86bcf2;
     color: #313131;
 }
 
@@ -83,4 +83,63 @@ input::placeholder, textarea::placeholder {
 .loading-gif {
     height: 1em;
     vertical-align: middle;
+}
+
+select:hover {
+    border-color: #888;
+}
+
+option {
+    padding: 10px;
+}
+
+
+/* Dropdown window*/
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+dropdownButton {
+    background-color: rgb(32, 107, 227);
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    outline: none;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    z-index: 10;
+}
+
+.dropdown-menu li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.dropdown-menu li:hover {
+    background-color: #f0f0f0;
+}
+
+.dropdown-menu li.selected::after {
+    content: '✔';
+    float: right;
+    color: green;
+    margin-left: 10px;
+}
+
+dropdownButton:hover {
+    border-color: #888;
 }

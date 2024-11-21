@@ -48,7 +48,7 @@ process
 async function withOracleDB(action) {
     let connection;
     try {
-        connection = await oracledb.getConnection(); // Gets a connection from the default pool 
+        connection = await oracledb.getConnection(); // Gets a connection from the default pool
         return await action(connection);
     } catch (err) {
         console.error(err);
@@ -82,6 +82,79 @@ async function fetchDemotableFromDb() {
         return result.rows;
     }).catch(() => {
         return [];
+    });
+}
+
+async function fetchTableFromDb(table) {
+    return await withOracleDB(async (connection) => {
+        const sql = `SELECT * FROM ${table}`;
+        const result = await connection.execute(sql);
+        return result;
+    }).catch((err) => {
+        console.error(err);
+        return [];
+    });
+}
+
+async function initializeCreateTables() {
+    return await withOracleDB(async (connection) => {
+        const fs = require('fs');
+        const sqlScript = fs.readFileSync('./CREATE_tables.sql', 'utf-8');
+
+        // Split the SQL commands and process them
+        const sqlStatements = sqlScript.split(';').map(command => command.trim()).filter(command => command);
+
+        try {
+            for (const statement of sqlStatements) {
+                if (statement) {
+                    try {
+                        const result = await connection.execute(statement);
+                        await connection.execute('COMMIT');
+                    } catch (error) {
+                        // If tables doesn't exist, we skip and move on to next command
+                        if (error.errorNum === 942) {
+                            console.warn(`Warning: Table does not exist. Moving on...`);
+                        } else {
+                            console.log("Error has occurred: ", error.errorNum);
+                            throw error;
+                        }
+                    }
+                }
+            }
+            console.log('INIT: SQL script executed successfully.');
+            return true;
+        } catch (error) {
+            console.error('INIT: Error executing SQL script:', error);
+            return false;
+        }
+    });
+}
+
+async function insertTables() {
+    return await withOracleDB(async (connection) => {
+        const fs = require('fs');
+        const sqlScript = fs.readFileSync('./INSERT_tables.sql', 'utf-8');
+
+        // Split the SQL commands and process them
+        const sqlStatements = sqlScript.split(';').map(command => command.trim()).filter(command => command);
+
+        try {
+            for (const statement of sqlStatements) {
+                if (statement) {
+                    try {
+                        const result = await connection.execute(statement);
+                        await connection.execute('COMMIT');
+                    } catch (error) {
+                        throw error;
+                    }
+                }
+            }
+            console.log('INSERT: SQL script executed successfully.');
+            return true;
+        } catch (error) {
+            console.error('Error executing SQL script:', error);
+            return false;
+        }
     });
 }
 
@@ -148,5 +221,8 @@ module.exports = {
     initiateDemotable, 
     insertDemotable, 
     updateNameDemotable, 
-    countDemotable
+    countDemotable,
+    initializeCreateTables,
+    insertTables,
+    fetchTableFromDb
 };
