@@ -1,17 +1,6 @@
-/*
- * These functions below are for various webpage functionalities. 
- * Each function serves to process data on the frontend:
- *      - Before sending requests to the backend.
- *      - After receiving responses from the backend.
- * 
- * To tailor them to your specific needs,
- * adjust or expand these functions to match both your 
- *   backend endpoints 
- * and 
- *   HTML structure.
- * 
- */
+/* Project Code*/
 
+// Initializes database and inserts starting values
 async function initializeAndInsertTables() {
     await initializeTables();
     await insertTables();
@@ -50,7 +39,7 @@ async function insertTables() {
     }
 }
 
-//EXAMPLE WILL DELETE LATER
+//TODO: Need to determine if we want to show DB connection status
 // This function checks the database connection and updates its status on the frontend.
 async function checkDbConnection() {
     const statusElem = document.getElementById('dbStatus');
@@ -66,43 +55,17 @@ async function checkDbConnection() {
     statusElem.style.display = 'inline';
 
     response.text()
-    .then((text) => {
-        statusElem.textContent = text;
-    })
-    .catch((error) => {
-        statusElem.textContent = 'connection timed out';  // Adjust error handling if required.
-    });
-}
-
-//EXAMPLE WILL DELETE LATER
-// Fetches data from the demotable and displays it.
-async function fetchAndDisplayUsers() {
-    const tableElement = document.getElementById('demotable');
-    const tableBody = tableElement.querySelector('tbody');
-
-    const response = await fetch('/demotable', {
-        method: 'GET'
-    });
-
-    const responseData = await response.json();
-    const demotableContent = responseData.data;
-
-    // Always clear old, already fetched data before new fetching process.
-    if (tableBody) {
-        tableBody.innerHTML = '';
-    }
-
-    demotableContent.forEach(user => {
-        const row = tableBody.insertRow();
-        user.forEach((field, index) => {
-            const cell = row.insertCell(index);
-            cell.textContent = field;
+        .then((text) => {
+            statusElem.textContent = text;
+        })
+        .catch((error) => {
+            statusElem.textContent = 'connection timed out';  // Adjust error handling if required.
         });
-    });
 }
 
-// Fetches data from the table and displays it.
-async function fetchAndDisplayUsers2() {
+// Fetches data from the table and displays it. (Currently in use and not an example)
+async function fetchAndDisplayUsers() {
+    console.log("FetchingAndDisplay STARTED");
     const content = [];
     const tablesContainer = document.getElementById('tablesContainer');
 
@@ -127,13 +90,14 @@ async function fetchAndDisplayUsers2() {
 
         try {
             console.log('SCRIPT-FETCH: fetching all users', sql);
-            const response = await fetch(sql, { method: 'GET' });
+            const response = await fetch(sql, {method: 'GET'});
             const responseData = await response.json();
+            console.log(responseData);
 
             if (responseData && responseData.data) {
                 const metaData = responseData.data.metaData;
                 const rows = responseData.data.rows;
-                content.push({ metaData, rows, tableTitle: option });
+                content.push({metaData, rows, tableTitle: option});
             }
         } catch (err) {
             console.error('Error fetching table data:', err);
@@ -142,7 +106,7 @@ async function fetchAndDisplayUsers2() {
 
     // After clearing, create new tables with the data fetched
     content.forEach(data => {
-        const { metaData, rows, tableTitle } = data;
+        const {metaData, rows, tableTitle} = data;
 
         // Create the table using your createTable function
         createTable(metaData, rows, tableTitle);
@@ -150,9 +114,9 @@ async function fetchAndDisplayUsers2() {
 }
 
 
-
 // Function to dynamically create a table for a given table name and its data
 function createTable(metaData, tableData, tableTitle) {
+    console.log("createTable STARTED")
     const tablesContainer = document.getElementById('tablesContainer');
 
     // Create a header for the table (e.g., a <h3> with the table's title)
@@ -172,14 +136,14 @@ function createTable(metaData, tableData, tableTitle) {
     if (Array.isArray(metaData) && metaData.length > 0) {
         metaData.forEach((item) => {
             const th = document.createElement('th');
-            th.innerText = item.name; // Use 'name' property from metaData for column name
+            th.innerText = item.name;
             headerRow.appendChild(th);
         });
         thead.appendChild(headerRow);
     } else {
         // If no metaData, add a header row indicating no data
         const th = document.createElement('th');
-        th.colSpan = 100;  // Span across all columns
+        th.colSpan = 100;
         th.innerText = 'No Available Data';
         headerRow.appendChild(th);
         thead.appendChild(headerRow);
@@ -205,7 +169,7 @@ function createTable(metaData, tableData, tableTitle) {
         // If no rows, add a row with a message indicating no data available
         const tr = document.createElement('tr');
         const td = document.createElement('td');
-        td.colSpan = metaData.length;  // Span across all columns
+        td.colSpan = metaData.length;
         td.innerText = 'No Data Available';
         tr.appendChild(td);
         tbody.appendChild(tr);
@@ -217,6 +181,233 @@ function createTable(metaData, tableData, tableTitle) {
     tablesContainer.appendChild(table);
 }
 
+// For dropdown menu
+const options = [
+    'Awards', 'Chatroom', 'CommentOn', 'Communities', 'EntryCreatedBy',
+    'Follows', 'GivenToBy', 'Images', 'JoinsChatRoom', 'JoinsCommunity',
+    'MessagesSentByIn', 'PostIn', 'Users', 'Videos', 'Vote'
+];
+
+// Dropdown for viewing table
+const dropdownButton = document.getElementById('dropdownButton');
+const dropdownMenu = document.getElementById('dropdownMenu');
+const selectedOptionsDisplay = document.getElementById('selectedOptions');
+let selectedOptions = [];
+
+// Dropdown for inserting
+const insertDropdownButton = document.getElementById('insertDropdownButton');
+const insertDropdownMenu = document.getElementById('insertDropdownMenu');
+const insertSelectedOptionsDisplay = document.getElementById('insertSelectedOptions');
+let insertSelectedOption = [];
+
+// Populate the dropdown
+function populateDropdown(button, menu, optionsArray, selectedArray, displayElement, multiSelect = true) {
+    optionsArray.forEach(optionText => {
+        const li = document.createElement('li');
+        li.textContent = optionText;
+
+        li.addEventListener('click', () => {
+            if (multiSelect) {
+                console.log("click")
+                // multi-select dropdown
+                li.classList.toggle('selected');
+                if (li.classList.contains('selected')) {
+                    selectedArray.push(optionText);
+                } else {
+                    const index = selectedArray.indexOf(optionText);
+                    if (index > -1) {
+                        selectedArray.splice(index, 1);
+                    }
+                }
+                fetchTableData();
+            } else {
+                // Single select dropdown
+                const previouslySelected = menu.querySelectorAll('.selected');
+                previouslySelected.forEach(item => item.classList.remove('selected'));
+                li.classList.toggle('selected');
+                if (li.classList.contains('selected')) {
+                    selectedArray = [optionText];
+                } else {
+                    li.classList.toggle('selected');
+                    const index = selectedArray.indexOf(optionText);
+                    if (index > -1) {
+                        selectedArray.splice(index, 1);
+                    }
+                }
+                console.log(selectedArray);
+                generateForm(selectedArray[0]);
+            }
+
+            // Update the displayed selected options
+            updateSelectedOptions(displayElement, selectedArray, multiSelect);
+            menu.style.display = 'none';
+        });
+
+        menu.appendChild(li);
+    });
+
+    // Toggle dropdown visibility on button click
+    button.addEventListener('click', () => {
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+}
+
+// Update the displayed selected options based on multiselect
+function updateSelectedOptions(displayElement, selectedArray, multiSelect) {
+    if (multiSelect) {
+        displayElement.textContent = selectedArray.length > 0 ? selectedArray.join(', ') : 'None';
+    } else {
+        displayElement.textContent = selectedArray.length > 0 ? selectedArray[0] : 'None';
+    }
+}
+
+// Make forms for inserting tables and their features
+// TODO: IMAGES AND VIDEOS HAVE NOT BEEN FIXED YET
+const featuresMap = {
+    Awards: ['Type', 'Username', 'entryID'],
+    Chatroom: ['ID', 'Name'],
+    CommentOn: ['Entry ID', 'On Entry ID'],
+    Communities: ['Community Name', 'Rules', 'Description'],
+    EntryCreatedBy: ['Entry ID', 'Date Created', 'Content', 'Username'],
+    Follows: ['Following Username', 'Follower Username'],
+    GivenToBy: ['Item', 'Giver', 'Receiver'],
+    Images: ['Image URL', 'Upload Date'],
+    JoinsChatRoom: ['Chatroom ID', 'Username'],
+    JoinsCommunity: ['Username', 'Community Name'],
+    MessagesSentByIn: ['ID', 'Date Sent', 'Content', 'Username', 'Chatroom ID'],
+    PostIn: ['Entry ID', 'Title', 'Community Name'],
+    Users: ['Username', 'Email', 'Join Date', 'Display Name', 'Following Users', 'Followed Users'],
+    Videos: ['Video URL', 'Upload Date'],
+    Vote: ['Username', 'EntryID', 'Upvote or DownVote']
+};
+
+// Generate Insert form
+function generateForm(option) {
+
+    // Clear previous form
+    const formContainer = document.getElementById('InsertRow');
+    formContainer.innerHTML = '';
+
+    // Create a form element
+    const features = featuresMap[option] || [];
+    const form = document.createElement('form');
+    form.id = 'dynamicForm';
+
+    features.forEach(feature => {
+        // Create a label and input for each feature
+        const label = document.createElement('label');
+        label.textContent = feature;
+        label.setAttribute('for', feature);
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = feature;
+        input.name = feature;
+
+        const div = document.createElement('div');
+        div.appendChild(label);
+        div.appendChild(input);
+
+        form.appendChild(div);
+    });
+    // Add a submit button
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.textContent = 'Submit';
+    form.appendChild(submitButton);
+    formContainer.appendChild(form);
+
+    // Add event listener to handle form submission
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Collect all the input values
+        const formData = {};
+        features.forEach(feature => {
+            const input = document.getElementById(feature);
+            if (input) {
+                formData[feature] = input.value;
+            }
+        });
+
+        // Print the form data to the console
+        console.log(formData);
+    });
+}
+
+// Populate both dropdowns on page load
+populateDropdown(dropdownButton, dropdownMenu, options, selectedOptions, selectedOptionsDisplay, true);
+populateDropdown(insertDropdownButton, insertDropdownMenu, options,
+    insertSelectedOption, insertSelectedOptionsDisplay, false);
+
+
+
+// TODO: RESET button seems to be buggy
+// This function resets the database
+async function resetDatabase() {
+    const response = await fetch("/initiate-table", {
+        method: 'POST'
+    });
+    const responseData = await response.json();
+
+    if (responseData.success) {
+        const messageElement = document.getElementById('resetResultMsg');
+        messageElement.textContent = "Database reset successfully!";
+        fetchTableData();
+    } else {
+        alert("Error restarting table!");
+    }
+}
+
+/* DEMO/TEMPLATE CODE */
+
+
+// EXAMPLE WILL DELETE LATER
+// This function resets or initializes the demotable.
+async function resetDemotable() {
+    const response = await fetch("/initiate-demotable", {
+        method: 'POST'
+    });
+    const responseData = await response.json();
+
+    if (responseData.success) {
+        const messageElement = document.getElementById('resetDatabaseResultMsg');
+        messageElement.textContent = "demotable initiated successfully!";
+        fetchTableDataDemo();
+    } else {
+        alert("Error initiating table!");
+    }
+}
+
+//EXAMPLE WILL DELETE LATER
+// Fetches data from the demotable and displays it.
+async function fetchAndDisplayUsersDemo() {
+    const tableElement = document.getElementById('demotable');
+    const tableBody = tableElement.querySelector('tbody');
+
+    const response = await fetch('/demotable', {
+        method: 'GET'
+    });
+
+    const responseData = await response.json();
+    const demotableContent = responseData.data;
+
+    // Always clear old, already fetched data before new fetching process.
+    if (tableBody) {
+        tableBody.innerHTML = '';
+    }
+
+    demotableContent.forEach(user => {
+        const row = tableBody.insertRow();
+        user.forEach((field, index) => {
+            const cell = row.insertCell(index);
+            cell.textContent = field;
+        });
+    });
+}
+
+
+// EXAMPLE
 // Inserts new records into the demotable.
 async function insertDemotable(event) {
     event.preventDefault();
@@ -246,6 +437,7 @@ async function insertDemotable(event) {
     }
 }
 
+// EXAMPLE
 // Updates names in the demotable.
 async function updateNameDemotable(event) {
     event.preventDefault();
@@ -269,12 +461,13 @@ async function updateNameDemotable(event) {
 
     if (responseData.success) {
         messageElement.textContent = "Name updated successfully!";
-        fetchTableData();
+        fetchTableDataDemo();
     } else {
         messageElement.textContent = "Error updating name!";
     }
 }
 
+// EXAMPLE
 // Counts rows in the demotable.
 // Modify the function accordingly if using different aggregate functions or procedures.
 async function countDemotable() {
@@ -293,80 +486,17 @@ async function countDemotable() {
     }
 }
 
-
-// For dropdown menu
-const options = [
-    'Awards', 'Chatroom', 'CommentOn', 'Communities', 'EntryCreatedBy',
-    'Follows', 'GivenToBy', 'Images', 'JoinsChatRoom', 'JoinsCommunity',
-    'MessagesSentByIn', 'PostIn', 'Users', 'Videos', 'Vote'
-];
-
-const dropdownButton = document.getElementById('dropdownButton');
-const dropdownMenu = document.getElementById('dropdownMenu');
-const selectedOptionsDisplay = document.getElementById('selectedOptions');
-
-// Array to store selected tables
-let selectedOptions = [];
-
-// Populate the dropdown
-function populateDropdown(optionsArray) {
-    optionsArray.forEach(optionText => {
-        const li = document.createElement('li');
-        li.textContent = optionText;
-
-        li.addEventListener('click', () => {
-            li.classList.toggle('selected');
-            if (li.classList.contains('selected')) {
-                selectedOptions.push(optionText);
-            } else {
-                const index = selectedOptions.indexOf(optionText);
-                if (index > -1) {
-                    selectedOptions.splice(index, 1);
-                }
-            }
-
-            // Update the dropdown and data tables
-            updateSelectedOptions();
-            fetchTableData2();
-
-            dropdownMenu.style.display = 'none';
-        });
-
-        dropdownMenu.appendChild(li);
-    });
-}
-
-// Update the displayed selected options
-function updateSelectedOptions() {
-    if (selectedOptions.length > 0) {
-        selectedOptionsDisplay.textContent = selectedOptions.join(', ');
-    } else {
-        selectedOptionsDisplay.textContent = 'None';
-    }
-}
-
-// Toggle dropdown visibility on button click
-dropdownButton.addEventListener('click', () => {
-    dropdownMenu.style.display =
-        dropdownMenu.style.display === 'block' ? 'none' : 'block';
-});
-
-// Populate the dropdown on page load
-populateDropdown(options);
-
-
-
-
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
 // Add or remove event listeners based on the desired functionalities.
-window.onload = function() {
+window.onload = function () {
     initializeAndInsertTables();
     checkDbConnection();
+    fetchTableDataDemo();
     fetchTableData();
-    fetchTableData2();
-    document.getElementById("selectButton").addEventListener("click", fetchTableData2);
+    document.getElementById("selectButton").addEventListener("click", fetchTableData);
     document.getElementById("resetDemotable").addEventListener("click", resetDemotable);
+    document.getElementById("resetDatabase").addEventListener("click", resetDatabase);
     document.getElementById("initTable").addEventListener("click", initializeAndInsertTables);
     document.getElementById("insertDemotable").addEventListener("submit", insertDemotable);
     document.getElementById("updataNameDemotable").addEventListener("submit", updateNameDemotable);
@@ -374,12 +504,15 @@ window.onload = function() {
 
 };
 
+// EXAMPLE FOR FETCHING DEMOTABLE
 // General function to refresh the displayed table data. 
 // You can invoke this after any table-modifying operation to keep consistency.
-function fetchTableData() {
-    fetchAndDisplayUsers();
+function fetchTableDataDemo() {
+    fetchAndDisplayUsersDemo();
 }
 
-function fetchTableData2() {
-    fetchAndDisplayUsers2();
+//Currently in use
+// Used to fetch and display table data.
+function fetchTableData() {
+    fetchAndDisplayUsers();
 }
