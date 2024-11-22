@@ -27,12 +27,31 @@ router.post("/initiate_create_table", async (req, res) => {
 });
 
 router.post("/insert_table", async (req, res) => {
+    const tableName = req.params.name;
+
+    if (!tableName) {
+        return res.status(400).json({ error: 'Table name is required' });
+    }
+
+    try {
+        const tableContent = await appService.fetchTableFromDb(tableName);
+        res.json({ data: tableContent});
+    } catch (err) {
+        res.status(500).json({ error: 'Error fetching table data' });
+    }
+
+
     const initiateResult = await appService.insertTables();
     if (initiateResult) {
         res.json({ success: true });
     } else {
         res.status(500).json({ success: false });
     }
+});
+
+router.get("/projection", async (req, res) => {
+    const tableContent = await appService.fetchTableFromDb();
+    res.json({data: tableContent});
 });
 
 router.get('/demotable', async (req, res) => {

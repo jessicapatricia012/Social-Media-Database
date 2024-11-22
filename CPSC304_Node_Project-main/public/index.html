@@ -35,19 +35,15 @@
 
     <br><hr><br> <!-- ========================================================================= -->
 
+    <!-- Show tables. Data will be fetched and inserted here dynamically using JavaScript. -->
+    <h2>Tables</h2>
     <div class="dropdown">
         <button id="dropdownButton">Select Tables</button>
         <ul id="dropdownMenu" class="dropdown-menu">
             <!-- Options will be dynamically populated -->
         </ul>
     </div>
-    <p>Selected Tables: <span id="selectedOptions">None</span></p>
     <!-- Tables will be placed here later-->
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <!-- Show tables. Data will be fetched and inserted here dynamically using JavaScript. -->
-    <h2>Tables</h2>
     <div id="tablesContainer">
         <table id="tables">
             <thead></thead>
@@ -58,7 +54,24 @@
 
     <br><hr><br> <!-- ========================================================================= -->
 
-    <p>Currently for is being printed into console. Need to complete insert function<p>
+    <h1>Projection<h1>
+    <h2> Choose tables to project </h2>
+    <p>Order the features you want to display</p>
+    <div class="projectDropdown">
+        <button id="projectDropdownButton">Select Tables</button>
+        <ul id="projectDropdownMenu" class="dropdown-menu">
+            <!-- Options will be dynamically populated -->
+        </ul>
+    </div>
+
+    <h3><span id="projectSelectedOptions"></span></h3>
+    <form id= "projectRow">
+        <!-- Form will be dynamically created-->
+    </form>
+
+    <br><hr><br> <!-- ========================================================================= -->
+
+    <p>Result is being printed into console. Need to complete insert function<p>
     <h2> Insert Values into Database </h2>
     <div class="insertDropdown">
         <button id="insertDropdownButton">Select Tables</button>

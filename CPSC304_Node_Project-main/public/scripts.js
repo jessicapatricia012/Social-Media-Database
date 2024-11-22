@@ -200,46 +200,97 @@ const insertDropdownMenu = document.getElementById('insertDropdownMenu');
 const insertSelectedOptionsDisplay = document.getElementById('insertSelectedOptions');
 let insertSelectedOption = [];
 
+// Dropdown for projection
+const projectDropdownButton = document.getElementById('projectDropdownButton');
+const projectDropdownMenu = document.getElementById('projectDropdownMenu');
+const projectSelectedOptionsDisplay = document.getElementById('projectSelectedOptions');
+let projectSelectedOption = [];
+
+// Configure Dropdown list
+function configureDropdown(li, optionText, selectedArray, multiSelect) {
+    // for multiSelect dropdown list
+    if (multiSelect) {
+        li.classList.toggle('selected');
+        if (li.classList.contains('selected')) {
+            selectedArray.push(optionText);
+        } else {
+            const index = selectedArray.indexOf(optionText);
+            if (index > -1) {
+                selectedArray.splice(index, 1);
+            }
+        }
+    } else {
+        // for single Select dropdown list
+        const previouslySelected = document.querySelectorAll('.selected');
+        previouslySelected.forEach(item => item.classList.remove('selected'));
+        li.classList.toggle('selected');
+
+        if (li.classList.contains('selected')) {
+            selectedArray.length = 0;
+            selectedArray.push(optionText);
+        } else {
+            const index = selectedArray.indexOf(optionText);
+            if (index > -1) {
+                selectedArray.splice(index, 1);
+            }
+        }
+    }
+}
+
+// Configure dropdown menu
+function configureListActions(sqlAction, li, optionText, selectedArray, multiSelect) {
+    let formContainer;
+    switch (sqlAction) {
+        case 'show':
+            // Multi select dropdown
+            configureDropdown(li, optionText, selectedArray, multiSelect);
+
+            // Fetch updated tables
+            fetchTableData();
+            break;
+
+        case 'insert':
+            // Single select dropdown
+            configureDropdown(li, optionText, selectedArray, multiSelect);
+
+            // Clear previous form
+            formContainer = document.getElementById("InsertRow");
+            formContainer.innerHTML = '';
+
+            // Generate form
+            generateForm(selectedArray[0], 'InsertRow', 'insert');
+            break;
+
+        case 'project':
+            // multi-select dropdown
+            configureDropdown(li, optionText, selectedArray, multiSelect);
+
+            // Clear previous form
+            formContainer = document.getElementById("projectRow");
+            formContainer.innerHTML = '';
+
+            console.log(selectedArray);
+            for (let table of selectedArray) {
+                generateForm(table, "projectRow", 'project');
+            }
+
+            break;
+
+        default:
+            console.error(`Unhandled sqlAction: ${sqlAction}`);
+    }
+
+}
+
+
+
 // Populate the dropdown
-function populateDropdown(button, menu, optionsArray, selectedArray, displayElement, multiSelect = true) {
+function populateDropdown(sqlAction, button, menu, optionsArray, selectedArray, displayElement, multiSelect = true) {
     optionsArray.forEach(optionText => {
         const li = document.createElement('li');
         li.textContent = optionText;
-
         li.addEventListener('click', () => {
-            if (multiSelect) {
-                console.log("click")
-                // multi-select dropdown
-                li.classList.toggle('selected');
-                if (li.classList.contains('selected')) {
-                    selectedArray.push(optionText);
-                } else {
-                    const index = selectedArray.indexOf(optionText);
-                    if (index > -1) {
-                        selectedArray.splice(index, 1);
-                    }
-                }
-                fetchTableData();
-            } else {
-                // Single select dropdown
-                const previouslySelected = menu.querySelectorAll('.selected');
-                previouslySelected.forEach(item => item.classList.remove('selected'));
-                li.classList.toggle('selected');
-                if (li.classList.contains('selected')) {
-                    selectedArray = [optionText];
-                } else {
-                    li.classList.toggle('selected');
-                    const index = selectedArray.indexOf(optionText);
-                    if (index > -1) {
-                        selectedArray.splice(index, 1);
-                    }
-                }
-                console.log(selectedArray);
-                generateForm(selectedArray[0]);
-            }
-
-            // Update the displayed selected options
-            updateSelectedOptions(displayElement, selectedArray, multiSelect);
+            configureListActions(sqlAction, li, optionText, selectedArray, multiSelect);
             menu.style.display = 'none';
         });
 
@@ -252,46 +303,48 @@ function populateDropdown(button, menu, optionsArray, selectedArray, displayElem
     });
 }
 
-// Update the displayed selected options based on multiselect
-function updateSelectedOptions(displayElement, selectedArray, multiSelect) {
-    if (multiSelect) {
-        displayElement.textContent = selectedArray.length > 0 ? selectedArray.join(', ') : 'None';
-    } else {
-        displayElement.textContent = selectedArray.length > 0 ? selectedArray[0] : 'None';
-    }
-}
-
 // Make forms for inserting tables and their features
 // TODO: IMAGES AND VIDEOS HAVE NOT BEEN FIXED YET
 const featuresMap = {
-    Awards: ['Type', 'Username', 'entryID'],
-    Chatroom: ['ID', 'Name'],
-    CommentOn: ['Entry ID', 'On Entry ID'],
-    Communities: ['Community Name', 'Rules', 'Description'],
-    EntryCreatedBy: ['Entry ID', 'Date Created', 'Content', 'Username'],
-    Follows: ['Following Username', 'Follower Username'],
-    GivenToBy: ['Item', 'Giver', 'Receiver'],
-    Images: ['Image URL', 'Upload Date'],
-    JoinsChatRoom: ['Chatroom ID', 'Username'],
-    JoinsCommunity: ['Username', 'Community Name'],
-    MessagesSentByIn: ['ID', 'Date Sent', 'Content', 'Username', 'Chatroom ID'],
-    PostIn: ['Entry ID', 'Title', 'Community Name'],
-    Users: ['Username', 'Email', 'Join Date', 'Display Name', 'Following Users', 'Followed Users'],
-    Videos: ['Video URL', 'Upload Date'],
-    Vote: ['Username', 'EntryID', 'Upvote or DownVote']
+    Awards: ['AwardType', 'value'],
+    Chatroom: ['ChatroomID', 'Name'],
+    CommentOn: ['EntryID', 'OnEntryID'],
+    Communities: ['CommunityName', 'Rules', 'Description'],
+    EntryCreatedBy: ['EntryID', 'DateCreated', 'Content', 'Username'],
+    Follows: ['FollowingUsername', 'FollowedUsername'],
+    GivenToBy: ['awardType', 'username', 'entryID'],
+    Images: ['ImageURL', 'UploadDate'],
+    JoinsChatRoom: ['ChatroomID', 'Username'],
+    JoinsCommunity: ['Username', 'CommunityName'],
+    MessagesSentByIn: ['MessageID', 'DateSent', 'Content', 'Username', 'ChatroomID'],
+    PostIn: ['EntryID', 'Title', 'CommunityName'],
+    Users: ['Username', 'Email', 'DateJoined', 'DisplayName', 'FollowingUsername', 'FollowedUsername'],
+    Videos: ['VideoURL', 'UploadDate'],
+    Vote: ['Username', 'EntryID', 'UpvoteOrDownVote']
 };
 
 // Generate Insert form
-function generateForm(option) {
+function generateForm(option, tableName, sqlCommand) {
+    const formContainer = document.getElementById(tableName);
+    let submitButton = formContainer.querySelector('.submit-button');
 
-    // Clear previous form
-    const formContainer = document.getElementById('InsertRow');
-    formContainer.innerHTML = '';
+    if (!submitButton) {
+        submitButton = document.createElement('button');
+        submitButton.type = 'button';
+        submitButton.classList.add('submit-button');
+        submitButton.textContent = 'Submit';
+        formContainer.appendChild(submitButton);
+    }
+
+    // Add a header to the form
+    const header = document.createElement('h2');
+    header.textContent = `${option}`;
+    formContainer.appendChild(header);
 
     // Create a form element
     const features = featuresMap[option] || [];
     const form = document.createElement('form');
-    form.id = 'dynamicForm';
+    form.id = `${tableName}Form`;
 
     features.forEach(feature => {
         // Create a label and input for each feature
@@ -310,35 +363,91 @@ function generateForm(option) {
 
         form.appendChild(div);
     });
-    // Add a submit button
-    const submitButton = document.createElement('button');
-    submitButton.type = 'submit';
-    submitButton.textContent = 'Submit';
-    form.appendChild(submitButton);
+
     formContainer.appendChild(form);
 
-    // Add event listener to handle form submission
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
+    switch (sqlCommand) {
+        case 'insert':
+            submitButton.addEventListener('click', function(event) {
 
-        // Collect all the input values
-        const formData = {};
-        features.forEach(feature => {
-            const input = document.getElementById(feature);
-            if (input) {
-                formData[feature] = input.value;
-            }
-        });
+                // Collect form data into an array
+                const formData = [];
+                const formElements = form.elements;
 
-        // Print the form data to the console
-        console.log(formData);
-    });
+                for (let element of formElements) {
+                    if (element.type !== 'submit' && element.type !== 'button') {
+                        formData.push({
+                            name: element.name,
+                            value: element.value || null
+                        });
+                    }
+                }
+
+                // Log the form data to the console
+                console.log("insert");
+                console.log(formData);
+            });
+            break;
+        case 'project':
+            submitButton.addEventListener('click', async function (event) {
+
+                // Collect form data into an array
+                const formData = [];
+                const formElements = form.elements;
+
+                for (let element of formElements) {
+                    if (element.type !== 'submit' && element.type !== 'button') {
+                        formData.push({
+                            name: element.name,
+                            value: element.value || null
+                        });
+                    }
+                }
+
+                console.log(formData);
+                let query = generateProjectQuery(option, formData);
+
+                const response = await fetch('/projection', {
+                    method: 'GET'
+                });
+
+                const responseData = await response.json();
+                const projectionContent = responseData.data;
+                console.log(responseData);
+                console.log(projectionContent);
+
+            });
+    }
+
 }
 
+function generateProjectQuery(tableName, formData) {
+    // Filter out items with null values
+    const filteredData = formData.filter(item => item.value !== null);
+
+    // Sort the filtered data
+    filteredData.sort((a, b) => Number(a.value) - Number(b.value));
+
+    // Build the SQL SELECT query for projection
+    const columns = filteredData.map(item => item.name);
+    const query = `SELECT ${columns.join(', ')} FROM ${tableName};`;
+
+    console.log(query);
+
+    return query;
+}
+
+
+
+
+
 // Populate both dropdowns on page load
-populateDropdown(dropdownButton, dropdownMenu, options, selectedOptions, selectedOptionsDisplay, true);
-populateDropdown(insertDropdownButton, insertDropdownMenu, options,
+populateDropdown('show', dropdownButton, dropdownMenu, options,
+    selectedOptions, selectedOptionsDisplay, true);
+populateDropdown('insert', insertDropdownButton, insertDropdownMenu, options,
     insertSelectedOption, insertSelectedOptionsDisplay, false);
+populateDropdown('project', projectDropdownButton, projectDropdownMenu, options,
+    projectSelectedOption, projectSelectedOptionsDisplay, true);
 
 
 

@@ -96,6 +96,17 @@ async function fetchTableFromDb(table) {
     });
 }
 
+async function projectionTableFromDb(table) {
+    return await withOracleDB(async (connection) => {
+        const sql = `SELECT * FROM ${table}`;
+        const result = await connection.execute(sql);
+        return result;
+    }).catch((err) => {
+        console.error(err);
+        return [];
+    });
+}
+
 async function initializeCreateTables() {
     return await withOracleDB(async (connection) => {
         const fs = require('fs');
