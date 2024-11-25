@@ -72,6 +72,17 @@ router.post("/initiate-tables", async (req, res) => {
     }
 });
 
+router.post('/insert-user' , async (req, res) => {
+    const {username, email ,dateJoined, name} = req.body;
+
+    const insertResult = await appService.insertUser(username, email, dateJoined, name);
+    if (insertResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+});
+
 router.post("/insert-demotable", async (req, res) => {
     const { id, name } = req.body;
     const insertResult = await appService.insertDemotable(id, name);

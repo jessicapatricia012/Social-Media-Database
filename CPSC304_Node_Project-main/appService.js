@@ -126,6 +126,40 @@ async function initializeCreateTables() {
     });
 }
 
+async function insertUser(username,email, dateJoined, name){
+     return await withOracleDB(async (connection) => {
+        //For Debugging
+        // console.log(username);
+        // console.log(email);
+        // console.log(name);
+        // console.log(dateJoined);
+
+        //This fixes bugs, IDK Why or How, all I know is I'm tired :)
+        const userName = username;
+        const emailAddr = email;
+        const disName = name;
+        const dateObj = new Date(dateJoined);
+        //const dateString = dateObj.toLocaleDateString('en-CA'); // in Format YYYY-MM-DD
+
+        //For Debugging
+        //console.log(dateObj);
+       //console.log(dateString);
+
+        const result = await connection.execute(
+            `INSERT INTO USERS(username, email, dateJoined, displayName) VALUES (:userName, :emailAddr, :dateObj, :disName)`,
+            [userName, emailAddr, dateObj, disName],
+            { autoCommit: true }
+        );
+        console.log("INSERT_USER: User Insertion succesful!")
+        console.log(result.rows);//For Debugging
+
+        return result.rowsAffected && result.rowsAffected > 0;
+    }).catch(() => {
+        return false;
+    });
+}
+
+
 async function insertTables() {
     return await withOracleDB(async (connection) => {
         const fs = require('fs');
@@ -221,5 +255,6 @@ module.exports = {
     countDemotable,
     initializeCreateTables,
     insertTables,
-    fetchTableFromDb
+    fetchTableFromDb,
+    insertUser
 };

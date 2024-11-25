@@ -216,6 +216,48 @@ function createTable(metaData, tableData, tableTitle) {
     tablesContainer.appendChild(table);
 }
 
+//Inserts new User into Users table
+async function insertUser(event){
+    event.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const displayName = document.getElementById('displayName').value;
+    const dateJoined = new Date();//gives date of now
+    
+    //For Debugging
+    // console.log(JSON.stringify({
+    //      username: username,
+    //         email: email,  
+    //         dateJoined: dateJoined,
+    //         name: displayName
+    // }));
+
+    const response = await fetch('/insert-user',{
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: username,
+            email: email,  
+            dateJoined: dateJoined,
+            name: displayName
+        })
+    });
+
+    const responseData = await response.json();
+    const messageElement = document.getElementById('insertUserMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "Account Created successfully!";
+        fetchTableData();
+    } else {
+        messageElement.textContent = "Error Creating Account!";
+    }
+
+}
+
 // Inserts new records into the demotable.
 async function insertDemotable(event) {
     event.preventDefault();
@@ -367,6 +409,7 @@ window.onload = function() {
     document.getElementById("selectButton").addEventListener("click", fetchTableData2);
     document.getElementById("resetDemotable").addEventListener("click", resetDemotable);
     document.getElementById("initTable").addEventListener("click", initializeAndInsertTables);
+    document.getElementById("insertUser").addEventListener("submit", insertUser);
     document.getElementById("insertDemotable").addEventListener("submit", insertDemotable);
     document.getElementById("updataNameDemotable").addEventListener("submit", updateNameDemotable);
     document.getElementById("countDemotable").addEventListener("click", countDemotable);
