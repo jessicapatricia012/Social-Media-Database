@@ -150,7 +150,6 @@ async function fetchAndDisplayUsers2() {
 }
 
 
-
 // Function to dynamically create a table for a given table name and its data
 function createTable(metaData, tableData, tableTitle) {
     const tablesContainer = document.getElementById('tablesContainer');

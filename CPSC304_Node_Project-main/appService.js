@@ -106,23 +106,19 @@ async function initializeCreateTables() {
 
         try {
             for (const statement of sqlStatements) {
+                console.log(statement);
                 if (statement) {
                     try {
                         const result = await connection.execute(statement);
                         await connection.execute('COMMIT');
                     } catch (error) {
-                        // If tables doesn't exist, we skip and move on to next command
-                        if (error.errorNum === 942) {
-                            console.warn(`Warning: Table does not exist. Moving on...`);
-                        } else {
-                            console.log("Error has occurred: ", error.errorNum);
+                        // Simplified error handling (let console.error below catch it)
                             throw error;
-                        }
                     }
                 }
             }
             console.log('INIT: SQL script executed successfully.');
-            return true;
+            return true; 
         } catch (error) {
             console.error('INIT: Error executing SQL script:', error);
             return false;
@@ -140,6 +136,7 @@ async function insertTables() {
 
         try {
             for (const statement of sqlStatements) {
+                console.log(statement);//For Debugging
                 if (statement) {
                     try {
                         const result = await connection.execute(statement);

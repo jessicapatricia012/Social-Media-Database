@@ -15,7 +15,6 @@ router.get('/check-db-connection', async (req, res) => {
     }
 });
 
-
 // Execute the SQL file and create tables
 router.post("/initiate_create_table", async (req, res) => {
     const initiateResult = await appService.initializeCreateTables();
