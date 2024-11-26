@@ -5,8 +5,9 @@ body {
     max-width: 800px;
     margin: auto;
     line-height: 1.6;
-    background-color: #86bcf2;
+    background-color: #b9d2e9;
     color: #313131;
+    display:block;
 }
 
 hr {
