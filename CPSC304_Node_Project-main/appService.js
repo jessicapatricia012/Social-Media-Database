@@ -96,14 +96,18 @@ async function fetchTableFromDb(table) {
     });
 }
 
-async function projectionTableFromDb(table) {
+// Assuming this function executes the SQL query passed to it.
+async function projectionTableFromDb(query) {
     return await withOracleDB(async (connection) => {
-        const sql = `SELECT * FROM ${table}`;
-        const result = await connection.execute(sql);
-        return result;
-    }).catch((err) => {
-        console.error(err);
-        return [];
+        console.log("Executing SQL:", query);
+        try {
+            const result = await connection.execute(query);
+            console.log("Query Results:", result.rows);
+            return result.rows;
+        } catch (error) {
+            console.error("Query Execution Error:", error.message);
+            return []; // Return empty array on error.
+        }
     });
 }
 
@@ -235,5 +239,6 @@ module.exports = {
     countDemotable,
     initializeCreateTables,
     insertTables,
-    fetchTableFromDb
+    fetchTableFromDb,
+    projectionTableFromDb
 };

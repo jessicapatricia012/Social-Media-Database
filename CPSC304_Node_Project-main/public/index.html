@@ -29,7 +29,7 @@
     <h3>Don't need this but keeping it just in case for now. Initializes on startup</h3>
     <h2>Initialize tables</h2>
     <p>Initialize Tables.</p>
-    <button id="initTable"> intialize </button> <br>
+    <button id="initTable"> initialize </button> <br>
     <div id="initTableResultMsg"></div>
     <div id="insertTableResultMsg"></div>
 
@@ -44,8 +44,8 @@
         </ul>
     </div>
     <!-- Tables will be placed here later-->
-    <div id="tablesContainer">
-        <table id="tables">
+    <div id="showTablesContainer">
+        <table id="showTables">
             <thead></thead>
             <tbody></tbody>
         </table>
@@ -54,7 +54,7 @@
 
     <br><hr><br> <!-- ========================================================================= -->
 
-    <h1>Projection<h1>
+    <h1>Projection</h1>
     <h2> Choose tables to project </h2>
     <p>Order the features you want to display</p>
     <div class="projectDropdown">
@@ -68,6 +68,13 @@
     <form id= "projectRow">
         <!-- Form will be dynamically created-->
     </form>
+        <div id="projectionTablesContainer">
+            <table id="projectionTables">
+                <thead></thead>
+                <tbody></tbody>
+            </table>
+
+        </div>
 
     <br><hr><br> <!-- ========================================================================= -->
 
@@ -88,7 +95,7 @@
 
     <h2>Reset Database</h2>
     <p>Click 'Reset' to reset the database.</p>
-    <button id="resetDatabase"> Reset </button>
+    <button id="resetDatabaseButton"> Reset </button>
     <div id="resetDatabaseResultMsg"></div>
 
     <br><hr><br> <!-- ========================================================================= -->
@@ -97,7 +104,7 @@
     <!-- Show 'Demotable'.
         Data will be fetched and inserted here dynamically using JavaScript. -->
     <h2>Show Demotable</h2>
-    <table id="demotable" border="1">
+    <table id="demotable">
         <thead>
         <tr>
             <!--Table head, need to be adjusted accordingly to align with your own.-->
@@ -122,7 +129,7 @@
     <br><hr><br> <!-- ========================================================================= -->
 
     <h2>Update Name in DemoTable</h2>
-    <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
+    <p>The values are case-sensitive and if you in the wrong case, the update statement will not do anything.</p>
     <form id="updataNameDemotable">
         Old Name: <input type="text" id="updateOldName" placeholder="Enter Old Name" required> <br><br>
         New Name: <input type="text" id="updateNewName" placeholder="Enter New Name" maxlength="20"> <br><br>
