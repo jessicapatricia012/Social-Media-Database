@@ -3,7 +3,8 @@ CREATE TABLE Users (
 	username	VARCHAR(50) 	PRIMARY KEY,
 	email	VARCHAR(50)	NOT NULL,
 	displayName	VARCHAR(50),
-	dateJoined	DATE	NOT NULL
+	dateJoined	DATE	NOT NULL,
+	UNIQUE (email)
 );
 
 CREATE TABLE UsersAge(
@@ -18,7 +19,7 @@ CREATE TABLE Communities (
 );
 
 CREATE TABLE EntryCreatedBy(
-	entryID NUMBER GENERATED AS IDENTITY PRIMARY KEY, 
+	entryID INTEGER PRIMARY KEY, 
 	dateCreated	DATE,
 	content	LONG,
 	username VARCHAR(50) REFERENCES Users(username)		

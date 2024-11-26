@@ -197,10 +197,11 @@ async function insertPost(user,title, community, content, date){
         });
 }
 
-    async function updateUser(username, email, displayName, dateJoined) {
-        console.log("a"); //not called
+async function updateUser(username, email, displayName, dateJoined) {
+    console.log("a");
+    try {
         return await withOracleDB(async (connection) => {
-            
+        
         const result = await connection.execute(
             `UPDATE USERS
             SET email = :email,
@@ -216,9 +217,14 @@ async function insertPost(user,title, community, content, date){
             { autoCommit: true }
         );
         return result.rowsAffected && result.rowsAffected > 0;
-    }).catch(() => {
-        return false;
-    });
+        });
+    } catch (error) {
+        if (error.message.includes("ORA-00001")) {
+            throw new Error("This email is already in use.");
+        } else {
+            throw new Error(error.message);
+        }
+    }
 }
 
 

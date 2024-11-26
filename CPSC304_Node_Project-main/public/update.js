@@ -1,4 +1,3 @@
-// Updates names in the demotable.
 async function updateUser(event) {
     console.log("clicked");
     event.preventDefault();
@@ -25,10 +24,10 @@ async function updateUser(event) {
     const updateNameResultMsg = document.getElementById('updateNameResultMsg');
 
     if (responseData.success) {
-        updateNameResultMsg.textContent = "Name updated successfully!";
+        updateNameResultMsg.textContent = "User updated successfully!";
         displayTuplesForUpdate();
     } else {
-        updateNameResultMsg.textContent = "Error updating name!";
+        updateNameResultMsg.textContent = responseData.message;
     }
 }
 

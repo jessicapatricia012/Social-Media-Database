@@ -107,13 +107,17 @@ router.post("/insert-demotable", async (req, res) => {
 
 router.post("/update-user", async (req, res) => {
     console.log('update router');
-    const { username, email, displayName, dateJoined } = req.body.clauses;
+    const { username, email, displayName, dateJoined } = req.body;
     
-    const updateResult = await appService.updateUser(username, email, displayName, dateJoined);
-    if (updateResult) {
-        res.json({ success: true });
-    } else {
-        res.status(500).json({ success: false });
+    try {
+        const updateResult = await appService.updateUser(username, email, displayName, dateJoined);
+        if (updateResult) {
+            res.json({ success: true });
+        } else {
+            res.status(500).json({ success: false });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
    
 });
