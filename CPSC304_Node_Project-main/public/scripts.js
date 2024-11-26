@@ -87,15 +87,18 @@ async function fetchAndDisplayUsers() {
     for (const option of selectedOptions) {
         let sql = "";
         if (option == 'image') {
-            sql = `/table/imagecontainedby1`;
+            sql = `/table/imagecontainedby`;
         } else if (option == 'video') {
-            sql = `/table/videocontainedby1`;
+            sql = `/table/videocontainedby`;
         } else {
             sql = `/table/${option}`;
         }
 
         try {
-            const response = await fetch(sql, {method: 'GET'});
+            console.log('SCRIPT-FETCH: fetching all users', sql);
+            const response = await fetch(sql, { 
+                method: 'GET' 
+            });
             const responseData = await response.json();
 
             if (responseData && responseData.data) {
@@ -184,7 +187,6 @@ function createTable(metaData, tableData, tableTitle, tableID) {
     // Add the table to the container
     tablesContainer.appendChild(table);
 }
-
 
 // --------------------------------------------------------------------------------
 // MAKING DROPDOWN
@@ -541,8 +543,82 @@ async function fetchAndDisplayUsersDemo() {
     });
 }
 
+//Inserts new User into Users table
+async function insertUser(event){
+    event.preventDefault();
 
-// EXAMPLE
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const displayName = document.getElementById('displayName').value;
+    const dateJoined = new Date();//gives date of now
+    
+    //For Debugging
+    // console.log(JSON.stringify({
+    //      username: username,
+    //         email: email,  
+    //         dateJoined: dateJoined,
+    //         name: displayName
+    // }));
+
+    const response = await fetch('/insert-user',{
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: username,
+            email: email,  
+            dateJoined: dateJoined,
+            name: displayName
+        })
+    });
+
+    const responseData = await response.json();
+    const messageElement = document.getElementById('insertUserMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "Account Created successfully!";
+        fetchTableData();
+    } else {
+        messageElement.textContent = "Error Creating Account!";
+    }
+}
+
+//Inserts new Post
+async function insertPost(event){
+    event.preventDefault();
+
+    const user = document.getElementById('user').value;
+    const community = document.getElementById('community').value;
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('content').value;
+    const date = new Date();
+
+    const response = await fetch('/insert-post', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            user:user,
+            title:title,
+            community:community,
+            content:content,
+            date:date
+        })
+    });
+
+    const responseData = await response.json();
+    const messageElement = document.getElementById('insertPostMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "Posted!";
+        fetchTableData();
+    } else {
+        messageElement.textContent = "Error Posting!";
+    }
+}
+
 // Inserts new records into the demotable.
 async function insertDemotable(event) {
     event.preventDefault();
@@ -572,37 +648,6 @@ async function insertDemotable(event) {
     }
 }
 
-// EXAMPLE
-// Updates names in the demotable.
-async function updateNameDemotable(event) {
-    event.preventDefault();
-
-    const oldNameValue = document.getElementById('updateOldName').value;
-    const newNameValue = document.getElementById('updateNewName').value;
-
-    const response = await fetch('/update-name-demotable', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            oldName: oldNameValue,
-            newName: newNameValue
-        })
-    });
-
-    const responseData = await response.json();
-    const messageElement = document.getElementById('updateNameResultMsg');
-
-    if (responseData.success) {
-        messageElement.textContent = "Name updated successfully!";
-        fetchTableDataDemo();
-    } else {
-        messageElement.textContent = "Error updating name!";
-    }
-}
-
-// EXAMPLE
 // Counts rows in the demotable.
 // Modify the function accordingly if using different aggregate functions or procedures.
 async function countDemotable() {
@@ -621,6 +666,66 @@ async function countDemotable() {
     }
 }
 
+// For dropdown menu
+const options = [
+    'Awards', 'Chatroom', 'CommentOn', 'Communities', 'EntryCreatedBy',
+    'Follows', 'GivenToBy', 'Images', 'JoinsChatRoom', 'JoinsCommunity',
+    'MessagesSentByIn', 'PostIn', 'Users', 'UsersAge', 'Videos', 'Vote'
+];
+
+const dropdownButton = document.getElementById('dropdownButton');
+const dropdownMenu = document.getElementById('dropdownMenu');
+const selectedOptionsDisplay = document.getElementById('selectedOptions');
+
+// Array to store selected tables
+let selectedOptions = [];
+
+// Populate the dropdown
+function populateDropdown(optionsArray) {
+    optionsArray.forEach(optionText => {
+        const li = document.createElement('li');
+        li.textContent = optionText;
+
+        li.addEventListener('click', () => {
+            li.classList.toggle('selected');
+            if (li.classList.contains('selected')) {
+                selectedOptions.push(optionText);
+            } else {
+                const index = selectedOptions.indexOf(optionText);
+                if (index > -1) {
+                    selectedOptions.splice(index, 1);
+                }
+            }
+
+            // Update the dropdown and data tables
+            updateSelectedOptions();
+            fetchTableData2();
+
+            dropdownMenu.style.display = 'none';
+        });
+
+        dropdownMenu.appendChild(li);
+    });
+}
+
+// Update the displayed selected options
+function updateSelectedOptions() {
+    if (selectedOptions.length > 0) {
+        selectedOptionsDisplay.textContent = selectedOptions.join(', ');
+    } else {
+        selectedOptionsDisplay.textContent = 'None';
+    }
+}
+
+// Toggle dropdown visibility on button click
+dropdownButton.addEventListener('click', () => {
+    dropdownMenu.style.display =
+        dropdownMenu.style.display === 'block' ? 'none' : 'block';
+});
+
+// Populate the dropdown on page load
+populateDropdown(options);
+
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
 // Add or remove event listeners based on the desired functionalities.
@@ -632,10 +737,10 @@ window.onload = function () {
     fetchTableData();
     document.getElementById("resetDatabaseButton").addEventListener("click", resetDatabase);
     document.getElementById("initTable").addEventListener("click", initializeAndInsertTables);
+    document.getElementById("insertUser").addEventListener("submit", insertUser);
     document.getElementById("insertDemotable").addEventListener("submit", insertDemotable);
-    document.getElementById("updataNameDemotable").addEventListener("submit", updateNameDemotable);
     document.getElementById("countDemotable").addEventListener("click", countDemotable);
-
+    document.getElementById("insertPost").addEventListener("submit",insertPost);
 };
 
 // EXAMPLE FOR FETCHING DEMOTABLE
@@ -650,3 +755,17 @@ function fetchTableDataDemo() {
 function fetchTableData() {
     fetchAndDisplayUsers();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

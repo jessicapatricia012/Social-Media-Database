@@ -24,8 +24,6 @@
         <img id="loadingGif" class="loading-gif" src="loading_100px.gif" alt="Loading...">
     </h3>
 
-    <br><hr><br> <!-- ========================================================================= -->
-
     <h3>Don't need this but keeping it just in case for now. Initializes on startup</h3>
     <h2>Initialize tables</h2>
     <p>Initialize Tables.</p>
@@ -62,6 +60,7 @@
         <ul id="projectDropdownMenu" class="dropdown-menu">
             <!-- Options will be dynamically populated -->
         </ul>
+        <button id="selectButton">Refresh</button>
     </div>
 
     <h3><span id="projectSelectedOptions"></span></h3>
@@ -117,6 +116,36 @@
     </table>
     <br><hr><br> <!-- ========================================================================= -->
 
+    <h2>Create Account</h2>
+    <p> Please Enter your your information :</p>
+    <form id="insertUser">
+        <label for="username">Username: </label>
+        <input type="text" id ="username" placeholder="Enter Username">
+        <label for="email">Email:</label>
+        <input type="email" id = "email" placeholder = "Enter Email">
+        <label for="displayName">Display Name: </label>
+        <input type="text" id = "displayName" placeholder = "Enter Display Name">
+        <button type = "submit">Create Account</button>
+        <div id = "insertUserMsg"></div>
+    </form>
+
+    <br><hr><br> <!-- ========================================================================= -->
+
+    <h2>Create Post</h2>
+    <form id ="insertPost">
+        <label for="user">Username</label>
+        <input type="text" id = "user">
+        <h3>Title</h3>
+        <input type="text" id = "title" placeholder="Enter Title">
+        <label for="community">Community</label>
+        <input type="text" id = "community" placeholder="Community">
+        <textarea id="content" placeholder="Write your post here..."></textarea>
+        <button type = "submit">Post</button>
+        <div id="insertPostMsg"></div>
+    </form>
+
+    <br><hr><br> <!-- ========================================================================= -->
+
     <h2> Insert Values into DemoTable </h2>
     <form id="insertDemotable">
         ID: <input type="number" id="insertId" placeholder="Enter ID" required> <br><br>
@@ -126,28 +155,70 @@
     </form>
     <div id="insertResultMsg"></div>
 
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <h2>Update Name in DemoTable</h2>
-    <p>The values are case-sensitive and if you in the wrong case, the update statement will not do anything.</p>
-    <form id="updataNameDemotable">
-        Old Name: <input type="text" id="updateOldName" placeholder="Enter Old Name" required> <br><br>
-        New Name: <input type="text" id="updateNewName" placeholder="Enter New Name" maxlength="20"> <br><br>
-
-        <button type="submit"> update </button> <br>
+    <br><hr><br> <!-- UPDATE========================================================================= -->
+    <h2>Update Attributes of User</h2>
+    <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
+    <button onclick="displayTuplesForUpdate();">Show Tuples</button>
+    <table id="updateTuplesTable">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Display Name</th>
+                <th>Date Joined</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>    
+    </table>
+    <div>
+        <h4 id="selectARowMsg"> Select a row </h4> 
+        <h4 id="updateUsername"></h4> 
+    </div>
+    <form id="updateDemotable" style="display: none;" onsubmit="updateUser(event)">
+        Email: <input type="text" id="updateEmail" maxlength="50"> <br>
+        DisplayName: <input type="text" id="updateDisplayName" required> <br>
+        Date Joined: <input type="date" id="updateDateJoined" required> <br>
+        <button type="submit" > update </button> <br>
     </form>
-    <!-- A placeholder to display messages related to the update operation. -->
     <div id="updateNameResultMsg"></div>
+     <!-- END OF UPDATE======================================================================== -->
+    
 
-    <br><hr><br> <!-- ========================================================================= -->
 
-    <h2>Count the Tuples in DemoTable</h2>
-    <button id="countDemotable"> count </button> <br><br>
+
+
+    <br><hr><br> <!-- SELECTION========================================================================= -->
+    <h2>Selection: Search Award</h2>
+    <p>clauses will be read from top to bottom (first AND/OR second) AND/OR third ...) </p>
+
+    <form id="selectionForm" onsubmit="searchAward(event)">
+        <div id="clausesContainer">
+            <!-- Conditions will be dynamically added here -->
+        </div>
+        <button type="button" id="addClauseButton" onclick="addClause();" >Add Clause</button> 
+        <br><br>
+        <button type="submit">Search</button>
+    </form>
+
+
+
+
+
+    <br><hr><br> <!-- END OF SELECTION======================================================================== -->
+
+
+
+
+    <!-- <h2>Count the Tuples in DemoTable</h2>
+    <button id="countDemotable"> count </button> <br><br> -->
     <!-- A placeholder to display the count result. -->
-    <div id="countResultMsg"></div> <br>
+    <!-- <div id="countResultMsg"></div> <br> -->
 
     <!-- ===================================================================================== -->
     <!-- External JavaScript file that contains the functionality/logic for the operations above. -->
     <script src="scripts.js"></script>
+    <script src="update.js"></script>
+    <script src="selection.js"></script>
 </body>
 </html>

@@ -15,7 +15,6 @@ router.get('/check-db-connection', async (req, res) => {
     }
 });
 
-
 // Execute the SQL file and create tables
 router.post("/initiate_create_table", async (req, res) => {
     const initiateResult = await appService.initializeCreateTables();
@@ -34,6 +33,7 @@ router.post("/insert_table", async (req, res) => {
         res.status(500).json({ success: false });
     }
 });
+
 
 router.get('/projection/:query', async (req, res) => {
     // Extract the query from the URL parameters.
@@ -101,6 +101,27 @@ router.post("/initiate-tables", async (req, res) => {
     }
 });
 
+router.post('/insert-user' , async (req, res) => {
+    const {username, email ,dateJoined, name} = req.body;
+
+    const insertResult = await appService.insertUser(username, email, dateJoined, name);
+    if (insertResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+});
+
+router.post('/insert-post' , async (req, res) => {
+    const {user, title, community, content, date} = req.body;
+    const insertResult = await appService.insertPost(user, title, community, content, date);
+    if (insertResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+});
+
 router.post("/insert-demotable", async (req, res) => {
     const { id, name } = req.body;
     const insertResult = await appService.insertDemotable(id, name);
@@ -111,30 +132,51 @@ router.post("/insert-demotable", async (req, res) => {
     }
 });
 
-router.post("/update-name-demotable", async (req, res) => {
-    const { oldName, newName } = req.body;
-    const updateResult = await appService.updateNameDemotable(oldName, newName);
-    if (updateResult) {
+router.post("/update-user", async (req, res) => {
+    console.log('update router');
+    const { username, email, displayName, dateJoined } = req.body;
+    
+    try {
+        const updateResult = await appService.updateUser(username, email, displayName, dateJoined);
+        if (updateResult) {
+            res.json({ success: true });
+        } else {
+            res.status(500).json({ success: false });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+   
+});
+
+router.post("/select-award", async (req, res) => {
+    console.log('search router');//not called
+    const clauses = req.body;
+    console.log('a', clauses);
+    
+    const searchResult = await appService.selectAward(clauses);
+    if (searchResult) {
         res.json({ success: true });
     } else {
         res.status(500).json({ success: false });
     }
+   
 });
 
-router.get('/count-demotable', async (req, res) => {
-    const tableCount = await appService.countDemotable();
-    if (tableCount >= 0) {
-        res.json({ 
-            success: true,  
-            count: tableCount
-        });
-    } else {
-        res.status(500).json({ 
-            success: false, 
-            count: tableCount
-        });
-    }
-});
+// router.get('/count-demotable', async (req, res) => {
+//     const tableCount = await appService.countDemotable();
+//     if (tableCount >= 0) {
+//         res.json({ 
+//             success: true,  
+//             count: tableCount
+//         });
+//     } else {
+//         res.status(500).json({ 
+//             success: false, 
+//             count: tableCount
+//         });
+//     }
+// });
 
 
 module.exports = router;
