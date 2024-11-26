@@ -83,6 +83,16 @@ router.post('/insert-user' , async (req, res) => {
     }
 });
 
+router.post('/insert-post' , async (req, res) => {
+    const {user, title, community, content, date} = req.body;
+    const insertResult = await appService.insertPost(user, title, community, content, date);
+    if (insertResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+});
+
 router.post("/insert-demotable", async (req, res) => {
     const { id, name } = req.body;
     const insertResult = await appService.insertDemotable(id, name);

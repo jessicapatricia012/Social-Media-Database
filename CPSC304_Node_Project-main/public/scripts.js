@@ -255,7 +255,41 @@ async function insertUser(event){
     } else {
         messageElement.textContent = "Error Creating Account!";
     }
+}
 
+//Inserts new Post
+async function insertPost(event){
+    event.preventDefault();
+
+    const user = document.getElementById('user').value;
+    const community = document.getElementById('community').value;
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('content').value;
+    const date = new Date();
+
+    const response = await fetch('/insert-post', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            user:user,
+            title:title,
+            community:community,
+            content:content,
+            date:date
+        })
+    });
+
+    const responseData = await response.json();
+    const messageElement = document.getElementById('insertPostMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "Posted!";
+        fetchTableData();
+    } else {
+        messageElement.textContent = "Error Posting!";
+    }
 }
 
 // Inserts new records into the demotable.
@@ -413,7 +447,7 @@ window.onload = function() {
     document.getElementById("insertDemotable").addEventListener("submit", insertDemotable);
     document.getElementById("updataNameDemotable").addEventListener("submit", updateNameDemotable);
     document.getElementById("countDemotable").addEventListener("click", countDemotable);
-
+    document.getElementById("insertPost").addEventListener("submit",insertPost);
 };
 
 // General function to refresh the displayed table data. 

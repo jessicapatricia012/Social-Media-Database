@@ -18,7 +18,7 @@ VALUES
 INSERT INTO USERS (USERNAME, EMAIL, DATEJOINED, DISPLAYNAME)
 VALUES
     ('BillyBobJoe', 'bbj@gmail.com', TO_DATE('2012-01-02', 'YYYY-MM-DD'), 'IAmBBJ');
-
+ 
 
 INSERT INTO COMMUNITIES(COMMUNITYNAME, RULE, DESCRIPTION) VALUES
 ('BuildAPC', '1. No harrasment\n 2. No Politics...', 'Welcome to the largest sub on anything
