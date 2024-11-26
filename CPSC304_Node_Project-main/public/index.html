@@ -24,7 +24,6 @@
         <img id="loadingGif" class="loading-gif" src="loading_100px.gif" alt="Loading...">
     </h3>
 
-    <br><hr><br> <!-- ========================================================================= -->
 
     <!-- Show 'Demotable'. 
         Data will be fetched and inserted here dynamically using JavaScript. -->
@@ -32,7 +31,6 @@
     <table id="demotable" border="1">
         <thead>
             <tr>
-                <!--Table head, need to be adjusted accordingly to align with your own.-->
                 <th>ID</th>
                 <th>Name</th>
             </tr>
@@ -137,11 +135,28 @@
         <button type="submit" > update </button> <br>
     </form>
     <div id="updateNameResultMsg"></div>
-    <br><hr><br> <!-- END OF UPDATE======================================================================== -->
-    <h2>Update Attributes of User</h2>
+     <!-- END OF UPDATE======================================================================== -->
+    
+
+
+
 
     <br><hr><br> <!-- SELECTION========================================================================= -->
-    <h2>Update Name in DemoTable</h2>
+    <h2>Selection: Search Award</h2>
+    <p>clauses will be read from top to bottom (first AND/OR second) AND/OR third ...) </p>
+
+    <form id="selectionForm" onsubmit="searchAward(event)">
+        <div id="clausesContainer">
+            <!-- Conditions will be dynamically added here -->
+        </div>
+        <button type="button" id="addClauseButton" onclick="addClause();" >Add Clause</button> 
+        <br><br>
+        <button type="submit">Search</button>
+    </form>
+
+
+
+
 
     <br><hr><br> <!-- END OF SELECTION======================================================================== -->
 
@@ -157,5 +172,6 @@
     <!-- External JavaScript file that contains the functionality/logic for the operations above. -->
     <script src="scripts.js"></script>
     <script src="update.js"></script>
+    <script src="selection.js"></script>
 </body>
 </html>

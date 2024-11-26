@@ -159,30 +159,58 @@ async function insertUser(username,email, dateJoined, name){
     });
 }
 
-    async function updateUser(username, email, displayName, dateJoined) {
-        console.log("a"); //not called
-        return await withOracleDB(async (connection) => {
+async function updateUser(username, email, displayName, dateJoined) {
+    return await withOracleDB(async (connection) => {
             
-            const result = await connection.execute(
-                `UPDATE USERS
-                SET email = :email,
-                    displayName = :displayName, 
-                    dateJoined = TO_DATE(:dateJoined, 'YYYY-MM-DD')
-                WHERE username = :username`,
-                {
-                    username: username,
-                    email: email,
-                    displayName: displayName,
-                    dateJoined: dateJoined           
-                },
-                { autoCommit: true }
-            );
+        const result = await connection.execute(
+            `UPDATE USERS
+            SET email = :email,
+                displayName = :displayName, 
+                dateJoined = TO_DATE(:dateJoined, 'YYYY-MM-DD')
+            WHERE username = :username`,
+            {
+                username: username,
+                email: email,
+                displayName: displayName,
+                dateJoined: dateJoined           
+            },
+            { autoCommit: true }
+        );
+        return result.rowsAffected && result.rowsAffected > 0;
+    }).catch(() => {
+        return false;
+    });
+}
 
-            return result.rowsAffected && result.rowsAffected > 0;
-        }).catch(() => {
-            return false;
+
+async function selectAward(clauses) {
+    console.log('search appservice'); //not called
+    return await withOracleDB(async (connection) => {
+        console.log('search appservice'); //not called
+        let sqlQuery = 'SELECT * FROM AWARDS WHERE ';
+        const queryParams = {};
+        
+        let count = 0;
+        clauses.forEach((clause, index) => {
+            if (count > 0) 
+                sqlQuery += ` ${clause.operator} `; //AND/OR added betwwen clauses
+
+            const a = `:${clause.attribute}_${index}`;
+            sqlQuery += `${clause.attribute} = ${a}`;
+            queryParams[a] = clause.value;
+            count++;
         });
-    }
+            
+        const result = await connection.execute(
+            sqlQuery,
+            queryParams,
+            { autoCommit: true }
+        );
+        return result.rows;
+    }).catch(() => {
+        return false;
+    });
+}
 
 
 async function insertTables() {
@@ -269,5 +297,6 @@ module.exports = {
     initializeCreateTables,
     insertTables,
     fetchTableFromDb,
-    insertUser
+    insertUser,
+    selectAward
 };

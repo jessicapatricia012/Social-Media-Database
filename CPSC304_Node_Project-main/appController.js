@@ -96,14 +96,30 @@ router.post("/insert-demotable", async (req, res) => {
 });
 
 router.post("/update-user", async (req, res) => {
-    console.log('b'); //also not called
-    const { username, email, displayName, dateJoined } = req.body;
+    console.log('update router');
+    const { username, email, displayName, dateJoined } = req.body.clauses;
+    
     const updateResult = await appService.updateUser(username, email, displayName, dateJoined);
     if (updateResult) {
         res.json({ success: true });
     } else {
         res.status(500).json({ success: false });
     }
+   
+});
+
+router.post("/select-award", async (req, res) => {
+    console.log('search router');//not called
+    const clauses = req.body;
+    console.log('a', clauses);
+    
+    const searchResult = await appService.selectAward(clauses);
+    if (searchResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+   
 });
 
 // router.get('/count-demotable', async (req, res) => {
