@@ -118,9 +118,9 @@ async function fetchAndDisplayUsers2() {
     for (const option of selectedOptions) {
         let sql = "";
         if (option == 'image') {
-            sql = `/table/imagecontainedby1`;
+            sql = `/table/imagecontainedby`;
         } else if (option == 'video') {
-            sql = `/table/videocontainedby1`;
+            sql = `/table/videocontainedby`;
         } else {
             sql = `/table/${option}`;
         }
@@ -348,7 +348,7 @@ async function countDemotable() {
 const options = [
     'Awards', 'Chatroom', 'CommentOn', 'Communities', 'EntryCreatedBy',
     'Follows', 'GivenToBy', 'Images', 'JoinsChatRoom', 'JoinsCommunity',
-    'MessagesSentByIn', 'PostIn', 'Users', 'Videos', 'Vote'
+    'MessagesSentByIn', 'PostIn', 'Users', 'UsersAge', 'Videos', 'Vote'
 ];
 
 const dropdownButton = document.getElementById('dropdownButton');
