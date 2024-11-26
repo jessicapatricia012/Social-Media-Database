@@ -196,6 +196,32 @@ async function insertPost(user,title, community, content, date){
         });
 }
 
+    async function updateUser(username, email, displayName, dateJoined) {
+        console.log("a"); //not called
+        return await withOracleDB(async (connection) => {
+            
+            const result = await connection.execute(
+                `UPDATE USERS
+                SET email = :email,
+                    displayName = :displayName, 
+                    dateJoined = TO_DATE(:dateJoined, 'YYYY-MM-DD')
+                WHERE username = :username`,
+                {
+                    username: username,
+                    email: email,
+                    displayName: displayName,
+                    dateJoined: dateJoined           
+                },
+                { autoCommit: true }
+            );
+
+            return result.rowsAffected && result.rowsAffected > 0;
+        }).catch(() => {
+            return false;
+        });
+    }
+
+
 async function insertTables() {
     return await withOracleDB(async (connection) => {
         const fs = require('fs');
@@ -259,19 +285,7 @@ async function insertDemotable(id, name) {
     });
 }
 
-async function updateNameDemotable(oldName, newName) {
-    return await withOracleDB(async (connection) => {
-        const result = await connection.execute(
-            `UPDATE DEMOTABLE SET name=:newName where name=:oldName`,
-            [newName, oldName],
-            { autoCommit: true }
-        );
 
-        return result.rowsAffected && result.rowsAffected > 0;
-    }).catch(() => {
-        return false;
-    });
-}
 
 async function countDemotable() {
     return await withOracleDB(async (connection) => {
@@ -288,7 +302,7 @@ module.exports = {
     fetchDemotableFromDb,
     initiateDemotable, 
     insertDemotable, 
-    updateNameDemotable, 
+    updateUser, 
     countDemotable,
     initializeCreateTables,
     insertTables,

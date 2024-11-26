@@ -34,6 +34,8 @@ router.post("/insert_table", async (req, res) => {
     }
 });
 
+
+
 router.get('/demotable', async (req, res) => {
     const tableContent = await appService.fetchDemotableFromDb();
     res.json({data: tableContent});
@@ -103,9 +105,10 @@ router.post("/insert-demotable", async (req, res) => {
     }
 });
 
-router.post("/update-name-demotable", async (req, res) => {
-    const { oldName, newName } = req.body;
-    const updateResult = await appService.updateNameDemotable(oldName, newName);
+router.post("/update-user", async (req, res) => {
+    console.log('b'); //also not called
+    const { username, email, displayName, dateJoined } = req.body;
+    const updateResult = await appService.updateUser(username, email, displayName, dateJoined);
     if (updateResult) {
         res.json({ success: true });
     } else {
@@ -113,20 +116,20 @@ router.post("/update-name-demotable", async (req, res) => {
     }
 });
 
-router.get('/count-demotable', async (req, res) => {
-    const tableCount = await appService.countDemotable();
-    if (tableCount >= 0) {
-        res.json({ 
-            success: true,  
-            count: tableCount
-        });
-    } else {
-        res.status(500).json({ 
-            success: false, 
-            count: tableCount
-        });
-    }
-});
+// router.get('/count-demotable', async (req, res) => {
+//     const tableCount = await appService.countDemotable();
+//     if (tableCount >= 0) {
+//         res.json({ 
+//             success: true,  
+//             count: tableCount
+//         });
+//     } else {
+//         res.status(500).json({ 
+//             success: false, 
+//             count: tableCount
+//         });
+//     }
+// });
 
 
 module.exports = router;

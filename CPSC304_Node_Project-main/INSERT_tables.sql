@@ -18,7 +18,7 @@ VALUES
 INSERT INTO USERS (USERNAME, EMAIL, DATEJOINED, DISPLAYNAME)
 VALUES
     ('BillyBobJoe', 'bbj@gmail.com', TO_DATE('2012-01-02', 'YYYY-MM-DD'), 'IAmBBJ');
- 
+
 
 INSERT INTO COMMUNITIES(COMMUNITYNAME, RULE, DESCRIPTION) VALUES
 ('BuildAPC', '1. No harrasment\n 2. No Politics...', 'Welcome to the largest sub on anything
@@ -36,4 +36,11 @@ INSERT INTO COMMUNITIES(COMMUNITYNAME, RULE, DESCRIPTION) VALUES
 ('Gaming', '1. Gaming topics only\n 2. No Politics...', 'Discuss the latest gaming news
 here!');
 
-SELECT * FROM USERS;
+INSERT INTO ENTRYCREATEDBY VALUES
+	(1, '2024-10-15', [content], 'hpoe01'),
+	(2, '2024-10-14', [content], 'hpoe01'),
+	(3, '2024-10-13', [content], 'jpat02'),
+    (4, '2024-10-12', [content], 'skat04'),
+	(5, '2024-10-11', [content], 'ljon05'),
+
+;

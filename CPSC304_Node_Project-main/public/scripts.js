@@ -127,7 +127,9 @@ async function fetchAndDisplayUsers2() {
 
         try {
             console.log('SCRIPT-FETCH: fetching all users', sql);
-            const response = await fetch(sql, { method: 'GET' });
+            const response = await fetch(sql, { 
+                method: 'GET' 
+            });
             const responseData = await response.json();
 
             if (responseData && responseData.data) {
@@ -321,34 +323,7 @@ async function insertDemotable(event) {
     }
 }
 
-// Updates names in the demotable.
-async function updateNameDemotable(event) {
-    event.preventDefault();
 
-    const oldNameValue = document.getElementById('updateOldName').value;
-    const newNameValue = document.getElementById('updateNewName').value;
-
-    const response = await fetch('/update-name-demotable', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            oldName: oldNameValue,
-            newName: newNameValue
-        })
-    });
-
-    const responseData = await response.json();
-    const messageElement = document.getElementById('updateNameResultMsg');
-
-    if (responseData.success) {
-        messageElement.textContent = "Name updated successfully!";
-        fetchTableData();
-    } else {
-        messageElement.textContent = "Error updating name!";
-    }
-}
 
 // Counts rows in the demotable.
 // Modify the function accordingly if using different aggregate functions or procedures.
@@ -445,7 +420,6 @@ window.onload = function() {
     document.getElementById("initTable").addEventListener("click", initializeAndInsertTables);
     document.getElementById("insertUser").addEventListener("submit", insertUser);
     document.getElementById("insertDemotable").addEventListener("submit", insertDemotable);
-    document.getElementById("updataNameDemotable").addEventListener("submit", updateNameDemotable);
     document.getElementById("countDemotable").addEventListener("click", countDemotable);
     document.getElementById("insertPost").addEventListener("submit",insertPost);
 };
@@ -459,3 +433,17 @@ function fetchTableData() {
 function fetchTableData2() {
     fetchAndDisplayUsers2();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
