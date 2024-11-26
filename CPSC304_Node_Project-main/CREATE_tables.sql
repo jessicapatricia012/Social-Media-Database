@@ -19,7 +19,6 @@ CREATE TABLE Users (
 	email	VARCHAR(50)	NOT NULL,
 	displayName	VARCHAR(50),
 	dateJoined	DATE	NOT NULL,
-	age INTEGER
 );
 
 CREATE TABLE UsersAge(
