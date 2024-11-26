@@ -18,7 +18,7 @@ CREATE TABLE Communities (
 );
 
 CREATE TABLE EntryCreatedBy(
-	entryID	INTEGER	PRIMARY KEY,
+	entryID NUMBER GENERATED AS IDENTITY PRIMARY KEY, 
 	dateCreated	DATE,
 	content	LONG,
 	username VARCHAR(50) REFERENCES Users(username)		
