@@ -445,6 +445,7 @@ async function performJoin() {
         document.getElementById('joinResult').value = query;
     }
 
+
     try {
         const response = await fetch(`/join/${query}`, { method: 'GET' });
         const { data } = await response.json();
