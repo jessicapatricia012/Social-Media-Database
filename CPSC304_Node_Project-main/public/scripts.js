@@ -39,6 +39,7 @@ async function insertTables() {
     }
 }
 
+
 //TODO: Need to determine if we want to show DB connection status
 // This function checks the database connection and updates its status on the frontend.
 async function checkDbConnection() {
