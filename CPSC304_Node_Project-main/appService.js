@@ -305,6 +305,29 @@ async function aggregateHaving() {
     });
 }
 
+async function division() {
+    console.log('division appservice'); 
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute( 
+            `SELECT username, displayName
+            FROM Users u
+            WHERE NOT EXISTS 
+                ((SELECT C.communityname
+                FROM Communities C)
+                MINUS
+                (SELECT j.communityName
+                FROM JoinsCommunity j
+                WHERE j.username = u.username))`,
+            [],
+            { autoCommit: true }
+        );
+        console.log(result); // empty []
+        return result.rows;
+    }).catch(() => {
+        return false;
+    });
+}
+
 
 async function insertTables() {
     return await withOracleDB(async (connection) => {
@@ -383,6 +406,7 @@ module.exports = {
     insertUser,
     selectAward,
     insertPost,
-    aggregateHaving
-    deleteUser
+    aggregateHaving,
+    deleteUser,
+    division
 };

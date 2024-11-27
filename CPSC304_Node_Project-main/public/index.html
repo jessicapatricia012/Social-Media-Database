@@ -181,9 +181,13 @@
 
     <br><hr><br> <!-- UPDATE========================================================================= -->
     <h2>Update Attributes of User</h2>
-    <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
-    <button class = "showTup" onclick="displayTuplesForUpdate();">Show Tuples</button>
-    <table id="updateTuplesTable">
+    <button id = "updateShowBtn" onclick="displayTuplesForUpdate();">Show Users</button>
+    <div style="display: flex; gap: 10px;">
+        <button id="updateHideBtn" style="display: none" onclick="HideUpdateTable();">Hide Table</button>
+        <button id="updateRefreshBtn" style="display: none" onclick="displayTuplesForUpdate();">Refresh</button>
+    </div>
+    <br>
+    <table id="updateTuplesTable" style="display: none;">
         <thead>
             <tr>
                 <th>Username</th>
@@ -195,14 +199,15 @@
         <tbody>
         </tbody>    
     </table>
+
     <div>
-        <h4 id="selectARowMsg"> Select a row </h4> 
-        <h4 id="updateUsername"></h4> 
+        <h4 id="selectARowMsg" style="display: none;"> Select a row </h4> 
     </div>
-    <form id="updateDemotable" style="display: none;" onsubmit="updateUser(event)">
-        Email: <input type="text" id="updateEmail" maxlength="50"> <br>
+    <form id="updateForm" style="display: none;" onsubmit="updateUser(event)">
+        Username: <input type="text" id="updateUsername" readonly> <br>
+        Email (this has to be unique): <input type="text" id="updateEmail" maxlength="50"> <br>
         DisplayName: <input type="text" id="updateDisplayName" required> <br>
-        Date Joined: <input type="date" id="updateDateJoined" required> <br>
+        Date Joined: <input type="date" id="updateDateJoined" readonly> <br>
         <button type="submit" > update </button> <br>
     </form>
     <div id="updateNameResultMsg"></div>
@@ -230,13 +235,14 @@
 
 
 
-
-
-
     <br><hr><br> <!-- AGGREGATION WITH HAVING========================================================================= -->
     <h2>Search for Users who has given at least 5 awards</h2>
     <button id="aHShowTableBtn" onclick="generateAgregateHavingTable();">Show Table</button>
-
+    <div style="display: flex; gap: 10px;">
+        <button id="aHHideTableBtn" style="display: none" onclick="HideAgregateHavingTable();">Hide Table</button>
+        <button id="aHRefreshTableBtn" style="display: none" onclick="generateAgregateHavingTable();">Refresh</button>
+    </div>
+    <br>
     <table id="aggregateHavingTable" style="display: none">
         <thead>
             <tr>
@@ -249,13 +255,43 @@
         </tbody>    
     </table>
     <br>
-    <div style="display: flex; gap: 10px;">
-        <button id="aHHideTableBtn" style="display: none" onclick="HideAgregateHavingTable();">Hide Table</button>
-        <button id="aHRefreshTableBtn" style="display: none" onclick="generateAgregateHavingTable();">Refresh</button>
-    </div>
-
     <div id="aggregateHavingResultMsg"></div>
-    <br><hr><br> <!-- END OF AGGREGATION WITH HAVING======================================================================== -->
+    <!-- END OF AGGREGATION WITH HAVING======================================================================== -->
+
+
+
+
+    <br><hr><br> <!-- DIVISION ========================================================================= -->
+    <h2>Search for Users who has joined all Comminities</h2>
+    <button id="divisionShowBtn" onclick="divisionShowUser();">Show Users</button>
+    <div style="display: flex; gap: 10px;">
+        <button id="divisionHideBtn" style="display: none" onclick="HideDivisionTable();">Hide Table</button>
+        <button id="divisionRefreshBtn" style="display: none" onclick="divisionShowUser();">Refresh</button>
+    </div>
+    <br>
+    <table id="divisionTable" style="display: none">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Display Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- rows hre -->
+        </tbody>    
+    </table>
+    <div id="divisionResultMsg"></div>
+    <!-- END OF DIVISION ======================================================================== -->
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -272,6 +308,7 @@
     <script src="update.js"></script>
     <script src="selection.js"></script>
     <script src="aggregateHaving.js"></script>
+    <script src="division.js"></script>
 </body>
 </body>
 </html>

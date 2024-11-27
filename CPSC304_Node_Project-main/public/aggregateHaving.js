@@ -1,5 +1,5 @@
 const aHShowTableBtn = document.getElementById('aHShowTableBtn');
-const tableElement = document.getElementById('aggregateHavingTable');
+const aggregateHavingTable = document.getElementById('aggregateHavingTable');
 const aHHideTableBtn = document.getElementById('aHHideTableBtn');
 const aHRefreshTableBtn = document.getElementById('aHRefreshTableBtn');
 const aggregateHavingResultMsg = document.getElementById('aggregateHavingResultMsg');
@@ -27,7 +27,7 @@ async function generateAgregateHavingTable() {
 
 async function displayTuplesForAggregateHaving(responseData) {
 
-    const tableBody = tableElement.querySelector('tbody');
+    const tableBody = aggregateHavingTable.querySelector('tbody');
 
     // clear old data
     if (tableBody) {
@@ -36,7 +36,7 @@ async function displayTuplesForAggregateHaving(responseData) {
     console.log(responseData.data);
 
     if( responseData.data.length == 0) {
-        aggregateHavingResultMsg.textContent= "No tuples found!"
+        aggregateHavingResultMsg.textContent= "No users found!"
         return;
     }
 
@@ -54,7 +54,7 @@ async function displayTuplesForAggregateHaving(responseData) {
         
     });
 
-    tableElement.style.display='block';
+    aggregateHavingTable.style.display='block';
     aHShowTableBtn.style.display='none';
     aHHideTableBtn.style.display='block';
     aHRefreshTableBtn.style.display='block';
@@ -62,7 +62,7 @@ async function displayTuplesForAggregateHaving(responseData) {
 }
 
 async function HideAgregateHavingTable() {
-    tableElement.style.display='none';
+    aggregateHavingTable.style.display='none';
     aHShowTableBtn.style.display='block';
     aHRefreshTableBtn.style.display='none';
     aHHideTableBtn.style.display='none';

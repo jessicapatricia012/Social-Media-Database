@@ -189,6 +189,20 @@ router.post("/aggregate-having", async (req, res) => {
    
 });
 
+router.post("/division", async (req, res) => {
+    console.log('division router');   //not called
+    const searchResult = await appService.division();
+    if (searchResult) {
+        if (searchResult.length>0)
+            res.json({ success: true, data: searchResult });
+        else
+            res.json({ success: true, data: [] });
+    } else {
+        res.status(500).json({ success: false });
+    }
+   
+});
+
 // router.get('/count-demotable', async (req, res) => {
 //     const tableCount = await appService.countDemotable();
 //     if (tableCount >= 0) {
