@@ -163,12 +163,26 @@ router.post("/update-user", async (req, res) => {
 
 router.post("/select-award", async (req, res) => {
     console.log('search router');//not called
-    const clauses = req.body;
+    const clauses = req.body.clauses;
     console.log('a', clauses);
     
     const searchResult = await appService.selectAward(clauses);
     if (searchResult) {
         res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+   
+});
+
+router.post("/aggregate-having", async (req, res) => {
+    console.log('a-having router');   //not called
+    const searchResult = await appService.aggregateHaving();
+    if (searchResult) {
+        if (searchResult.length>0)
+            res.json({ success: true, data: searchResult });
+        else
+            res.json({ success: true, data: [] });
     } else {
         res.status(500).json({ success: false });
     }
