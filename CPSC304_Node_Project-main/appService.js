@@ -96,7 +96,7 @@ async function fetchTableFromDb(table) {
     });
 }
 
-// Assuming this function executes the SQL query passed to it.
+// Function executes the SQL query passed to it and returns the data.
 async function projectionTableFromDb(query) {
     return await withOracleDB(async (connection) => {
         console.log("Executing SQL:", query);

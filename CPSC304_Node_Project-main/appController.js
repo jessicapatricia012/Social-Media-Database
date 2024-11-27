@@ -62,6 +62,33 @@ router.get('/projection/:query', async (req, res) => {
     }
 });
 
+router.get('/join/:query', async (req, res) => {
+    // Extract the query from the URL parameters.
+    const queryParam = req.params.query;
+
+    // Log the received query.
+    console.log('Received Query:', queryParam);
+
+    if (!queryParam) {
+        return res.status(400).json({ error: 'Query parameter is required' });
+    }
+
+    try {
+        // Decode the query parameter (since it might be URL encoded).
+        const decodedQuery = decodeURIComponent(queryParam);
+        console.log("Decoded Query:", decodedQuery);
+
+        // Perform the database query with the decoded query string.
+        const tableContent = await appService.projectionTableFromDb(decodedQuery);
+
+        // Send the response with the data.
+        res.json({ data: tableContent });
+    } catch (err) {
+        console.error("Error processing query:", err.message);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
 
 router.get('/demotable', async (req, res) => {
     const tableContent = await appService.fetchDemotableFromDb();

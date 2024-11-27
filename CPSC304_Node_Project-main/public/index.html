@@ -67,28 +67,58 @@
     <form id= "projectRow">
         <!-- Form will be dynamically created-->
     </form>
-        <div id="projectionTablesContainer">
-            <table id="projectionTables">
-                <thead></thead>
-                <tbody></tbody>
-            </table>
+    <div id="projectionTablesContainer">
+        <table id="projectionTables">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
 
-        </div>
+    </div>
 
     <br><hr><br> <!-- ========================================================================= -->
 
-    <p>Result is being printed into console. Need to complete insert function<p>
-    <h2> Insert Values into Database </h2>
-    <div class="insertDropdown">
-        <button id="insertDropdownButton">Select Tables</button>
-        <ul id="insertDropdownMenu" class="dropdown-menu">
-            <!-- Options will be dynamically populated -->
-        </ul>
-    </div>
-    <h3><span id="insertSelectedOptions"></span></h3>
-    <form id= "InsertRow">
-        <!-- Form will be dynamically created-->
+    <h2> Look at Entries created by a user</h2>
+    <form id="joinForm">
+        <h3>Select Attributes to Include:</h3>
+        <!--User check boxes-->
+        <fieldset>
+            <legend>Users Table</legend>
+            <input type="checkbox" id="joinUsername" name="attributes" value="Users.username">
+            <label for="joinUsername">Username</label><br>
+            <input type="checkbox" id="joinEmail" name="attributes" value="Users.email">
+            <label for="joinEmail">Email</label><br>
+            <input type="checkbox" id="joinDisplayName" name="attributes" value="Users.displayName">
+            <label for="joinDisplayName">Display Name</label><br>
+            <input type="checkbox" id="joinDateJoined" name="attributes" value="Users.dateJoined">
+            <label for="joinDateJoined">Date Joined</label><br>
+        </fieldset>
+        <!--Entry check boxes-->
+        <fieldset>
+            <legend>EntryCreatedBy Table</legend>
+            <input type="checkbox" id="JoinEntryID" name="attributes" value="EntryCreatedBy.entryID">
+            <label for="joinEntryID">Entry ID</label><br>
+            <input type="checkbox" id="joinDateCreated" name="attributes" value="EntryCreatedBy.dateCreated">
+            <label for="joinDateCreated">Date Created</label><br>
+            <input type="checkbox" id="joinContent" name="attributes" value="EntryCreatedBy.content">
+            <label for="joinContent">Content</label><br>
+        </fieldset>
+        <p>Write down which user you would like to preview</p>
+        <input type="text" id="usernameInput" placeholder="Enter username">
+
+        <!-- button to call join-->
+        <button id= "joinButton">Submit</button>
     </form>
+    <div id="joinResult"></div>
+    <!--table to show result-->
+    <div id="joinTablesContainer">
+        <table id="joinTables">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+
+
 
     <br><hr><br> <!-- ========================================================================= -->
 
