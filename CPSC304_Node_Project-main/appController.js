@@ -35,6 +35,33 @@ router.post("/insert_table", async (req, res) => {
 });
 
 
+router.get('/projection/:query', async (req, res) => {
+    // Extract the query from the URL parameters.
+    const queryParam = req.params.query;
+
+    // Log the received query.
+    console.log('Received Query:', queryParam);
+
+    if (!queryParam) {
+        return res.status(400).json({ error: 'Query parameter is required' });
+    }
+
+    try {
+        // Decode the query parameter (since it might be URL encoded).
+        const decodedQuery = decodeURIComponent(queryParam);
+        console.log("Decoded Query:", decodedQuery);
+
+        // Perform the database query with the decoded query string.
+        const tableContent = await appService.projectionTableFromDb(decodedQuery);
+
+        // Send the response with the data.
+        res.json({ data: tableContent });
+    } catch (err) {
+        console.error("Error processing query:", err.message);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
 
 router.get('/demotable', async (req, res) => {
     const tableContent = await appService.fetchDemotableFromDb();
@@ -94,6 +121,18 @@ router.post('/insert-post' , async (req, res) => {
         res.status(500).json({ success: false });
     }
 });
+
+router.post("/delete-user", async(req,res) =>{
+    const {username} = req.body;
+    const deleteResult = await appService.deleteUser(username);
+
+        if (deleteResult){
+            res.json({success:true});
+        } else{
+            res.status(500).json({success:false});
+        }
+});
+
 
 router.post("/insert-demotable", async (req, res) => {
     const { id, name } = req.body;

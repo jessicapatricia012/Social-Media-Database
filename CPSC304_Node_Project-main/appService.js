@@ -96,6 +96,21 @@ async function fetchTableFromDb(table) {
     });
 }
 
+// Assuming this function executes the SQL query passed to it.
+async function projectionTableFromDb(query) {
+    return await withOracleDB(async (connection) => {
+        console.log("Executing SQL:", query);
+        try {
+            const result = await connection.execute(query);
+            console.log("Query Results:", result.rows);
+            return result.rows;
+        } catch (error) {
+            console.error("Query Execution Error:", error.message);
+            return []; // Return empty array on error.
+        }
+    });
+}
+
 async function initializeCreateTables() {
     return await withOracleDB(async (connection) => {
         const fs = require('fs');
@@ -112,8 +127,12 @@ async function initializeCreateTables() {
                         const result = await connection.execute(statement);
                         await connection.execute('COMMIT');
                     } catch (error) {
-                        // Simplified error handling (let console.error below catch it)
+                        if (error.message.includes('ORA-00942')) {
+                            console.warn(`Table already exists, skipping: ${statement}`);
+                        } else {
+                            // Re-throw error if it's not a specific known error
                             throw error;
+                        }
                     }
                 }
             }
@@ -159,7 +178,6 @@ async function insertUser(username,email, dateJoined, name){
     });
 }
 
-
 async function insertPost(user,title, community, content, date){
         return await withOracleDB(async (connection) => {
             try{
@@ -195,6 +213,24 @@ async function insertPost(user,title, community, content, date){
                 return false;
             }
         });
+}
+
+async function deleteUser(username){
+    return await withOracleDB(async (connection) => {
+        try{
+            const deleteResult = await connection.execute(
+                'DELETE FROM USERS WHERE username = :username',
+                [username],
+                {autoCommit:true}
+            );
+            console.log(deleteResult);
+            console.log("DELETE USER: Delete Succesful!");
+            return deleteResult.rowsAffected && deleteResult.rowsAffected > 0;
+        } catch (error){
+            console.log("DELETE POST: Fail", error);
+            return false;
+        }
+    });
 }
 
 async function updateUser(username, email, displayName, dateJoined) {
@@ -334,29 +370,19 @@ async function insertDemotable(id, name) {
 }
 
 
-
-async function countDemotable() {
-    return await withOracleDB(async (connection) => {
-        const result = await connection.execute('SELECT Count(*) FROM DEMOTABLE');
-        return result.rows[0][0];
-    }).catch(() => {
-        return -1;
-    });
-}
-
-
 module.exports = {
     testOracleConnection,
     fetchDemotableFromDb,
     initiateDemotable, 
     insertDemotable, 
-    updateUser, 
-    countDemotable,
+    updateUser,
     initializeCreateTables,
     insertTables,
     fetchTableFromDb,
+    projectionTableFromDb,
     insertUser,
     selectAward,
     insertPost,
     aggregateHaving
+    deleteUser
 };

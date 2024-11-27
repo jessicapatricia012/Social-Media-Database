@@ -1,17 +1,6 @@
-/*
- * These functions below are for various webpage functionalities. 
- * Each function serves to process data on the frontend:
- *      - Before sending requests to the backend.
- *      - After receiving responses from the backend.
- * 
- * To tailor them to your specific needs,
- * adjust or expand these functions to match both your 
- *   backend endpoints 
- * and 
- *   HTML structure.
- * 
- */
+/* Project Code*/
 
+// Initializes database and inserts starting values
 async function initializeAndInsertTables() {
     await initializeTables();
     await insertTables();
@@ -50,7 +39,8 @@ async function insertTables() {
     }
 }
 
-//EXAMPLE WILL DELETE LATER
+
+//TODO: Need to determine if we want to show DB connection status
 // This function checks the database connection and updates its status on the frontend.
 async function checkDbConnection() {
     const statusElem = document.getElementById('dbStatus');
@@ -66,17 +56,444 @@ async function checkDbConnection() {
     statusElem.style.display = 'inline';
 
     response.text()
-    .then((text) => {
-        statusElem.textContent = text;
-    })
-    .catch((error) => {
-        statusElem.textContent = 'connection timed out';  // Adjust error handling if required.
+        .then((text) => {
+            statusElem.textContent = text;
+        })
+        .catch((error) => {
+            statusElem.textContent = 'connection timed out';  // Adjust error handling if required.
+        });
+}
+
+// Clears all data in table
+function clearTable(tableID) {
+    const tablesContainer = document.getElementById(tableID);
+    if (tablesContainer) {
+        tablesContainer.innerHTML = '';
+    } else {
+        console.error("Tables container not found");
+    }
+}
+
+// Fetches data from the table and displays it.
+async function fetchAndDisplayUsers() {
+    console.log("FetchingAndDisplay STARTED");
+    const content = [];
+
+    // Clear the entire container before new fetching process
+    clearTable('showTablesContainer');
+
+    // Continue with fetching and displaying the data
+    for (const option of selectedOptions) {
+        let sql = `/table/${option}`;
+
+        try {
+            console.log('SCRIPT-FETCH: fetching all users', sql);
+            const response = await fetch(sql, { 
+                method: 'GET' 
+            });
+            const responseData = await response.json();
+
+            if (responseData && responseData.data) {
+                const metaData = responseData.data.metaData;
+                const rows = responseData.data.rows;
+                content.push({metaData, rows, tableTitle: option});
+            }
+        } catch (err) {
+            console.error('Error fetching table data:', err);
+        }
+    }
+
+    // After clearing, create new tables with the data fetched
+    content.forEach(data => {
+        const {metaData, rows, tableTitle} = data;
+        createTable(metaData, rows, tableTitle, 'showTablesContainer');
     });
+}
+
+
+// Function to dynamically create a table for a given table name and its data
+function createTable(metaData, tableData, tableTitle, tableID) {
+    const tablesContainer = document.getElementById(tableID);
+
+    // HTML FORMATTING
+    // Create a header for the table
+    const tableHeader = document.createElement('h3');
+    tableHeader.innerText = tableTitle;
+    tablesContainer.appendChild(tableHeader);
+
+    // Create the table element
+    const table = document.createElement('table');
+    table.setAttribute('border', '1');
+
+    // Create the table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+
+    // FORMATTING TABLE HEADERS
+    // Create table headers based on columns in the metaData
+    console.log(metaData);
+    if (Array.isArray(metaData) && metaData.length > 0) {
+        metaData.forEach((item) => {
+            const th = document.createElement('th');
+            th.innerText = item.name;
+            headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+    } else {
+        // If no metaData, add a header row indicating no data
+        const th = document.createElement('th');
+        th.colSpan = 100;
+        th.innerText = 'No Available Data';
+        headerRow.appendChild(th);
+        thead.appendChild(headerRow);
+    }
+    table.appendChild(thead);
+
+    // INPUTTING DATA INTO TABLE
+    // Create the table body
+    const tbody = document.createElement('tbody');
+
+    // If there is data, create rows
+    if (Array.isArray(tableData) && tableData.length > 0) {
+        tableData.forEach((row) => {
+            const tr = document.createElement('tr');
+            row.forEach((value) => {
+                const td = document.createElement('td');
+                // Check if value is null or undefined, replace with 'Empty'
+                td.innerText = (value === null || value === undefined) ? 'Empty' : value;
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    } else {
+        // If no rows, add a row with a message indicating no data available
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = metaData.length;
+        td.innerText = 'No Data Available';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+    }
+
+    table.appendChild(tbody);
+
+    // Add the table to the container
+    tablesContainer.appendChild(table);
+}
+
+// --------------------------------------------------------------------------------
+// MAKING DROPDOWN
+// --------------------------------------------------------------------------------
+// For dropdown menu
+const options = [
+    'Awards', 'Chatroom', 'CommentOn', 'Communities', 'EntryCreatedBy',
+    'Follows', 'GivenToBy', 'Images', 'JoinsChatRoom', 'JoinsCommunity',
+    'MessagesSentByIn', 'PostIn', 'Users', 'Videos', 'Vote'
+];
+
+// Dropdown for viewing table
+const dropdownButton = document.getElementById('dropdownButton');
+const dropdownMenu = document.getElementById('dropdownMenu');
+const selectedOptionsDisplay = document.getElementById('selectedOptions');
+let selectedOptions = [];
+
+// Dropdown for inserting
+const insertDropdownButton = document.getElementById('insertDropdownButton');
+const insertDropdownMenu = document.getElementById('insertDropdownMenu');
+const insertSelectedOptionsDisplay = document.getElementById('insertSelectedOptions');
+let insertSelectedOption = [];
+
+// Dropdown for projection
+const projectDropdownButton = document.getElementById('projectDropdownButton');
+const projectDropdownMenu = document.getElementById('projectDropdownMenu');
+const projectSelectedOptionsDisplay = document.getElementById('projectSelectedOptions');
+let projectSelectedOption = [];
+
+// Configure Dropdown list
+function configureDropdown(li, optionText, selectedArray, multiSelect) {
+    // for multiSelect dropdown list
+    if (multiSelect) {
+        li.classList.toggle('selected');
+        if (li.classList.contains('selected')) {
+            selectedArray.push(optionText);
+        } else {
+            const index = selectedArray.indexOf(optionText);
+            if (index > -1) {
+                selectedArray.splice(index, 1);
+            }
+        }
+    } else {
+        // for single Select dropdown list
+        const previouslySelected = document.querySelectorAll('.selected');
+        previouslySelected.forEach(item => item.classList.remove('selected'));
+        li.classList.toggle('selected');
+
+        if (li.classList.contains('selected')) {
+            selectedArray.length = 0;
+            selectedArray.push(optionText);
+        } else {
+            const index = selectedArray.indexOf(optionText);
+            if (index > -1) {
+                selectedArray.splice(index, 1);
+            }
+        }
+    }
+}
+
+// Configure dropdown menu
+function configureListActions(sqlAction, li, optionText, selectedArray, multiSelect) {
+    let formContainer;
+    switch (sqlAction) {
+        case 'show':
+            // Multi select dropdown
+            configureDropdown(li, optionText, selectedArray, multiSelect);
+
+            // Fetch updated tables
+            fetchTableData();
+            break;
+
+        case 'insert':
+            // Single select dropdown
+            configureDropdown(li, optionText, selectedArray, multiSelect);
+
+            // Clear previous form
+            formContainer = document.getElementById("InsertRow");
+            formContainer.innerHTML = '';
+
+            // Generate form
+            generateForm(selectedArray[0], 'InsertRow', 'insert');
+            break;
+
+        case 'project':
+            // multi-select dropdown
+            configureDropdown(li, optionText, selectedArray, multiSelect);
+
+            // Clear previous form
+            formContainer = document.getElementById("projectRow");
+            formContainer.innerHTML = '';
+
+            console.log(selectedArray);
+            for (let table of selectedArray) {
+                generateForm(table, "projectRow", 'project');
+            }
+
+            break;
+
+        default:
+            console.error(`Unhandled sqlAction: ${sqlAction}`);
+    }
+
+}
+
+// Populate the dropdown
+function populateDropdown(sqlAction, button, menu, optionsArray, selectedArray, displayElement, multiSelect = true) {
+    optionsArray.forEach(optionText => {
+        const li = document.createElement('li');
+        li.textContent = optionText;
+        li.addEventListener('click', () => {
+            configureListActions(sqlAction, li, optionText, selectedArray, multiSelect);
+            menu.style.display = 'none';
+        });
+
+        menu.appendChild(li);
+    });
+
+    // Toggle dropdown visibility on button click
+    button.addEventListener('click', () => {
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+}
+
+// Make forms for inserting tables and their features
+// TODO: IMAGES AND VIDEOS HAVE NOT BEEN FIXED YET
+
+const featuresMap = {
+    Award: ['AwardType', 'value'],
+    Chatroom: ['ChatroomID', 'Name'],
+    CommentOn: ['EntryID', 'OnEntryID'],
+    Communities: ['CommunityName', 'Rule', 'Description'],
+    EntryCreatedBy: ['EntryID', 'DateCreated', 'Content', 'Username'],
+    Follows: ['FollowingUsername', 'FollowedUsername'],
+    GivenToBy: ['awardType', 'username', 'entryID'],
+    Images: ['ImageURL', 'UploadDate'],
+    JoinsChatRoom: ['ChatroomID', 'Username'],
+    JoinsCommunity: ['Username', 'CommunityName'],
+    MessagesSentByIn: ['MessageID', 'DateSent', 'Content', 'Username', 'ChatroomID'],
+    PostIn: ['EntryID', 'Title', 'CommunityName'],
+    Users: ['Username', 'Email', 'DateJoined', 'DisplayName'],
+    UsersAge: ['dateJoined', 'age'],
+    Videos: ['VideoURL', 'UploadDate'],
+    Vote: ['Username', 'EntryID', 'UpvoteOrDownVote'],
+    ImageContainedBy: ['AttachmentID', 'imageFile', 'entryID', 'messageID'],
+    VideoContainedBy: ['AttachmentID', 'videoFile', 'entryID', 'messageID']
+};
+
+// Makes a submit button
+function makeSubmitButton(tableName) {
+    const formContainer = document.getElementById(tableName);
+    let submitButton= document.createElement('button');
+    submitButton.type = 'button';
+    submitButton.classList.add('submit-button');
+    submitButton.textContent = 'Submit';
+    formContainer.appendChild(submitButton);
+
+    return submitButton;
+}
+
+// Generate Insert form
+function generateForm(option, tableName, sqlCommand) {
+    const formContainer = document.getElementById(tableName);
+    let submitButton = formContainer.querySelector('.submit-button');
+
+    if (!submitButton) {
+        submitButton = makeSubmitButton(tableName);
+    }
+
+    // Add a header to the form
+    const header = document.createElement('h2');
+    header.textContent = `${option}`;
+    formContainer.appendChild(header);
+
+    // Create a form element
+    const features = featuresMap[option] || [];
+    const form = document.createElement('form');
+    form.id = `${tableName}Form`;
+
+    features.forEach(feature => {
+        // Create a label and input for each feature
+        const label = document.createElement('label');
+        label.textContent = feature;
+        label.setAttribute('for', feature);
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = feature;
+        input.name = feature;
+
+        const div = document.createElement('div');
+        div.appendChild(label);
+        div.appendChild(input);
+
+        form.appendChild(div);
+    });
+
+    formContainer.appendChild(form);
+
+    switch (sqlCommand) {
+        case 'insert':
+            submitButton.addEventListener('click', function(event) {
+
+                // Collect form data into an array
+                const formData = [];
+                const formElements = form.elements;
+
+                for (let element of formElements) {
+                    if (element.type !== 'submit' && element.type !== 'button') {
+                        formData.push({
+                            name: element.name,
+                            value: element.value || null
+                        });
+                    }
+                }
+                // Log the form data to the console
+                console.log("insert");
+                console.log(formData);
+            });
+            break;
+        case 'project':
+            submitButton.addEventListener('click', async function (event) {
+                await performProjection(form, option);
+            });
+    }
+
+}
+
+// Gathers data in the form, performs projection, and updates html
+async function performProjection(form, option) {
+    clearTable("projectionTablesContainer");
+    // tablesContainer.innerHTML = "";
+
+    // Collect form data into an array
+    const formData = [];
+    const formElements = form.elements;
+
+    for (let element of formElements) {
+        if (element.type !== 'submit' && element.type !== 'button') {
+            formData.push({
+                name: element.name,
+                value: element.value || null
+            });
+        }
+    }
+
+    // Generate the query object
+    const query = generateProjectQuery(option, formData);
+
+    // Make the request to the server with query
+    try {
+        const response = await fetch(`/projection/${query}`, { method: 'GET' });
+        const { data } = await response.json();
+        const filteredData = formData.filter(item => item.value !== null);
+        filteredData.sort((a, b) => Number(a.value) - Number(b.value));
+        const formDataWithoutValue = filteredData.map(({ value, ...rest }) => rest);
+        console.log("FORMDATAWITHOUTVALUE: ", formDataWithoutValue);
+
+        // update HTML
+        createTable(formDataWithoutValue, data, option, "projectionTablesContainer");
+    } catch (err) {
+        console.error('Error fetching data:', err);
+    }
+
+}
+
+// Generates query for projection
+function generateProjectQuery(tableName, formData) {
+    // Filter out items with null values
+    const filteredData = formData.filter(item => item.value !== null);
+
+    // Sort the filtered data
+    filteredData.sort((a, b) => Number(a.value) - Number(b.value));
+
+    // Build the SQL SELECT query for projection
+    const columns = filteredData.map(item => item.name);
+    const query = `SELECT ${columns.join(', ')} FROM ${tableName}`;
+
+    console.log(query);
+
+    return query;
+}
+
+
+// Populate both dropdowns on page load
+console.log('populating dropdown');
+populateDropdown('show', dropdownButton, dropdownMenu, options,
+    selectedOptions, selectedOptionsDisplay, true);
+console.log('populated dropdown');
+populateDropdown('insert', insertDropdownButton, insertDropdownMenu, options,
+    insertSelectedOption, insertSelectedOptionsDisplay, false);
+populateDropdown('project', projectDropdownButton, projectDropdownMenu, options,
+    projectSelectedOption, projectSelectedOptionsDisplay, true);
+
+// This function resets the database
+async function resetDatabase() {
+    const response = await fetch("/initiate_create_table", {
+        method: 'POST'
+    });
+    const responseData = await response.json();
+
+    if (responseData.success) {
+        const messageElement = document.getElementById('resetDatabaseResultMsg');
+        messageElement.textContent = "Database reset successfully!";
+        fetchTableData();
+        console.log("Reset Successful");
+    } else {
+        alert("Error restarting table!");
+    }
 }
 
 //EXAMPLE WILL DELETE LATER
 // Fetches data from the demotable and displays it.
-async function fetchAndDisplayUsers() {
+async function fetchAndDisplayUsersDemo() {
     const tableElement = document.getElementById('demotable');
     const tableBody = tableElement.querySelector('tbody');
 
@@ -99,123 +516,6 @@ async function fetchAndDisplayUsers() {
             cell.textContent = field;
         });
     });
-}
-
-// Fetches data from the table and displays it.
-async function fetchAndDisplayUsers2() {
-    const content = [];
-    const tablesContainer = document.getElementById('tablesContainer');
-
-    // Clear the entire container before new fetching process
-    if (tablesContainer) {
-        tablesContainer.innerHTML = '';
-    } else {
-        console.error("Tables container not found");
-        return;
-    }
-
-    // Continue with fetching and displaying the data
-    for (const option of selectedOptions) {
-        let sql = "";
-        if (option == 'image') {
-            sql = `/table/imagecontainedby`;
-        } else if (option == 'video') {
-            sql = `/table/videocontainedby`;
-        } else {
-            sql = `/table/${option}`;
-        }
-
-        try {
-            console.log('SCRIPT-FETCH: fetching all users', sql);
-            const response = await fetch(sql, { 
-                method: 'GET' 
-            });
-            const responseData = await response.json();
-
-            if (responseData && responseData.data) {
-                const metaData = responseData.data.metaData;
-                const rows = responseData.data.rows;
-                content.push({ metaData, rows, tableTitle: option });
-            }
-        } catch (err) {
-            console.error('Error fetching table data:', err);
-        }
-    }
-
-    // After clearing, create new tables with the data fetched
-    content.forEach(data => {
-        const { metaData, rows, tableTitle } = data;
-
-        // Create the table using your createTable function
-        createTable(metaData, rows, tableTitle);
-    });
-}
-
-
-// Function to dynamically create a table for a given table name and its data
-function createTable(metaData, tableData, tableTitle) {
-    const tablesContainer = document.getElementById('tablesContainer');
-
-    // Create a header for the table (e.g., a <h3> with the table's title)
-    const tableHeader = document.createElement('h3');
-    tableHeader.innerText = tableTitle;
-    tablesContainer.appendChild(tableHeader);
-
-    // Create the table element
-    const table = document.createElement('table');
-    table.setAttribute('border', '1');
-
-    // Create the table header
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-
-    // Create table headers based on columns in the metaData
-    if (Array.isArray(metaData) && metaData.length > 0) {
-        metaData.forEach((item) => {
-            const th = document.createElement('th');
-            th.innerText = item.name; // Use 'name' property from metaData for column name
-            headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
-    } else {
-        // If no metaData, add a header row indicating no data
-        const th = document.createElement('th');
-        th.colSpan = 100;  // Span across all columns
-        th.innerText = 'No Available Data';
-        headerRow.appendChild(th);
-        thead.appendChild(headerRow);
-    }
-    table.appendChild(thead);
-
-    // Create the table body
-    const tbody = document.createElement('tbody');
-
-    // If there is data, create rows
-    if (Array.isArray(tableData) && tableData.length > 0) {
-        tableData.forEach((row) => {
-            const tr = document.createElement('tr');
-            row.forEach((value) => {
-                const td = document.createElement('td');
-                // Check if value is null or undefined, replace with 'Empty'
-                td.innerText = (value === null || value === undefined) ? 'Empty' : value;
-                tr.appendChild(td);
-            });
-            tbody.appendChild(tr);
-        });
-    } else {
-        // If no rows, add a row with a message indicating no data available
-        const tr = document.createElement('tr');
-        const td = document.createElement('td');
-        td.colSpan = metaData.length;  // Span across all columns
-        td.innerText = 'No Data Available';
-        tr.appendChild(td);
-        tbody.appendChild(tr);
-    }
-
-    table.appendChild(tbody);
-
-    // Add the table to the container
-    tablesContainer.appendChild(table);
 }
 
 //Inserts new User into Users table
@@ -323,8 +623,6 @@ async function insertDemotable(event) {
     }
 }
 
-
-
 // Counts rows in the demotable.
 // Modify the function accordingly if using different aggregate functions or procedures.
 async function countDemotable() {
@@ -343,95 +641,40 @@ async function countDemotable() {
     }
 }
 
-
-// For dropdown menu
-const options = [
-    'Awards', 'Chatroom', 'CommentOn', 'Communities', 'EntryCreatedBy',
-    'Follows', 'GivenToBy', 'Images', 'JoinsChatRoom', 'JoinsCommunity',
-    'MessagesSentByIn', 'PostIn', 'Users', 'UsersAge', 'Videos', 'Vote'
-];
-
-const dropdownButton = document.getElementById('dropdownButton');
-const dropdownMenu = document.getElementById('dropdownMenu');
-const selectedOptionsDisplay = document.getElementById('selectedOptions');
-
-// Array to store selected tables
-let selectedOptions = [];
-
-// Populate the dropdown
-function populateDropdown(optionsArray) {
-    optionsArray.forEach(optionText => {
-        const li = document.createElement('li');
-        li.textContent = optionText;
-
-        li.addEventListener('click', () => {
-            li.classList.toggle('selected');
-            if (li.classList.contains('selected')) {
-                selectedOptions.push(optionText);
-            } else {
-                const index = selectedOptions.indexOf(optionText);
-                if (index > -1) {
-                    selectedOptions.splice(index, 1);
-                }
-            }
-
-            // Update the dropdown and data tables
-            updateSelectedOptions();
-            fetchTableData2();
-
-            dropdownMenu.style.display = 'none';
-        });
-
-        dropdownMenu.appendChild(li);
-    });
-}
-
-// Update the displayed selected options
-function updateSelectedOptions() {
-    if (selectedOptions.length > 0) {
-        selectedOptionsDisplay.textContent = selectedOptions.join(', ');
-    } else {
-        selectedOptionsDisplay.textContent = 'None';
-    }
-}
-
-// Toggle dropdown visibility on button click
-dropdownButton.addEventListener('click', () => {
-    dropdownMenu.style.display =
-        dropdownMenu.style.display === 'block' ? 'none' : 'block';
-});
-
-// Populate the dropdown on page load
-populateDropdown(options);
-
-
-
+// // Toggle dropdown visibility on button click
+// dropdownButton.addEventListener('click', () => {
+//     console.log("clicked");
+//     dropdownMenu.style.display =
+//         dropdownMenu.style.display === 'block' ? 'none' : 'block';
+// });
 
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
 // Add or remove event listeners based on the desired functionalities.
-window.onload = function() {
+window.onload = function () {
+    console.log("Starting");
     initializeAndInsertTables();
     checkDbConnection();
+    fetchTableDataDemo();
     fetchTableData();
-    fetchTableData2();
-    document.getElementById("selectButton").addEventListener("click", fetchTableData2);
-    document.getElementById("resetDemotable").addEventListener("click", resetDemotable);
+    document.getElementById("resetDatabaseButton").addEventListener("click", resetDatabase);
     document.getElementById("initTable").addEventListener("click", initializeAndInsertTables);
     document.getElementById("insertUser").addEventListener("submit", insertUser);
     document.getElementById("insertDemotable").addEventListener("submit", insertDemotable);
-    document.getElementById("countDemotable").addEventListener("click", countDemotable);
     document.getElementById("insertPost").addEventListener("submit",insertPost);
 };
 
+// EXAMPLE FOR FETCHING DEMOTABLE
 // General function to refresh the displayed table data. 
 // You can invoke this after any table-modifying operation to keep consistency.
-function fetchTableData() {
-    fetchAndDisplayUsers();
+function fetchTableDataDemo() {
+    fetchAndDisplayUsersDemo();
 }
 
-function fetchTableData2() {
-    fetchAndDisplayUsers2();
+//Currently in use
+// Used to fetch and display table data.
+function fetchTableData() {
+    fetchAndDisplayUsers();
 }
 
 
