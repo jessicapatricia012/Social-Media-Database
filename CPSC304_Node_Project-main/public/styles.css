@@ -169,6 +169,10 @@ button#deleteButton{
     margin-bottom:20px;
 }
 
+.hide-table{
+    display:none;
+}
+
 /* Update User */
 button.showTup{
     margin-bottom: 15px;

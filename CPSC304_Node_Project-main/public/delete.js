@@ -1,7 +1,7 @@
 
 const selectButton = document.getElementById('selectAccount');
 const deleteButton = document.getElementById('deleteButton');
-selectButton.addEventListener('click',displayUsers);
+selectButton.addEventListener('click',toggleTable);
 deleteButton.addEventListener('click',deleteSelected);
 
 
@@ -73,3 +73,17 @@ async function deleteSelected(){
         deleteUserMsg.textContent = "Delete Failed!";
     }
 }
+
+function toggleTable(){
+    const deleteUserTable = document.getElementById("deleteUserTable");
+    const showTableButton = document.getElementById("selectAccount");
+    deleteUserTable.classList.toggle("hide-table");
+
+    if (deleteUserTable.classList.contains("hide-table")){
+        showTableButton.textContent = "Show Table";
+    } else{
+        showTableButton.textContent = "Hide Table";
+    }
+}
+
+displayUsers();
