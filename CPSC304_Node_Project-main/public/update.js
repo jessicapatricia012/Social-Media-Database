@@ -30,11 +30,12 @@ async function updateUser(event) {
         });
 
         const responseData = await response.json();
-
+        updateNameResultMsg.style.display="block";
         if (responseData.success) {
             updateNameResultMsg.textContent = "User updated successfully!";
             displayTuplesForUpdate();
         } else {
+            
             updateNameResultMsg.textContent = responseData.message;
         }
     } catch (error) {
