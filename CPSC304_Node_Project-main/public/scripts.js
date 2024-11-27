@@ -76,7 +76,6 @@ function clearTable(tableID) {
 
 // Fetches data from the table and displays it.
 async function fetchAndDisplayUsers() {
-    console.log("FetchingAndDisplay STARTED");
     const content = [];
 
     // Clear the entire container before new fetching process
@@ -87,7 +86,6 @@ async function fetchAndDisplayUsers() {
         let sql = `/table/${option}`;
 
         try {
-            console.log('SCRIPT-FETCH: fetching all users', sql);
             const response = await fetch(sql, { 
                 method: 'GET' 
             });
@@ -131,7 +129,6 @@ function createTable(metaData, tableData, tableTitle, tableID) {
 
     // FORMATTING TABLE HEADERS
     // Create table headers based on columns in the metaData
-    console.log(metaData);
     if (Array.isArray(metaData) && metaData.length > 0) {
         metaData.forEach((item) => {
             const th = document.createElement('th');
@@ -186,7 +183,7 @@ function createTable(metaData, tableData, tableTitle, tableID) {
 // --------------------------------------------------------------------------------
 // For dropdown menu
 const options = [
-    'Awards', 'Chatroom', 'CommentOn', 'Communities', 'EntryCreatedBy',
+    'Award', 'Chatroom', 'CommentOn', 'Communities', 'EntryCreatedBy',
     'Follows', 'GivenToBy', 'Images', 'JoinsChatRoom', 'JoinsCommunity',
     'MessagesSentByIn', 'PostIn', 'Users', 'Videos', 'Vote'
 ];
@@ -196,12 +193,6 @@ const dropdownButton = document.getElementById('dropdownButton');
 const dropdownMenu = document.getElementById('dropdownMenu');
 const selectedOptionsDisplay = document.getElementById('selectedOptions');
 let selectedOptions = [];
-
-// Dropdown for inserting
-const insertDropdownButton = document.getElementById('insertDropdownButton');
-const insertDropdownMenu = document.getElementById('insertDropdownMenu');
-const insertSelectedOptionsDisplay = document.getElementById('insertSelectedOptions');
-let insertSelectedOption = [];
 
 // Dropdown for projection
 const projectDropdownButton = document.getElementById('projectDropdownButton');
@@ -247,7 +238,6 @@ function configureListActions(sqlAction, li, optionText, selectedArray, multiSel
         case 'show':
             // Multi select dropdown
             configureDropdown(li, optionText, selectedArray, multiSelect);
-
             // Fetch updated tables
             fetchTableData();
             break;
@@ -255,11 +245,9 @@ function configureListActions(sqlAction, li, optionText, selectedArray, multiSel
         case 'insert':
             // Single select dropdown
             configureDropdown(li, optionText, selectedArray, multiSelect);
-
             // Clear previous form
             formContainer = document.getElementById("InsertRow");
             formContainer.innerHTML = '';
-
             // Generate form
             generateForm(selectedArray[0], 'InsertRow', 'insert');
             break;
@@ -272,7 +260,6 @@ function configureListActions(sqlAction, li, optionText, selectedArray, multiSel
             formContainer = document.getElementById("projectRow");
             formContainer.innerHTML = '';
 
-            console.log(selectedArray);
             for (let table of selectedArray) {
                 generateForm(table, "projectRow", 'project');
             }
@@ -446,6 +433,35 @@ async function performProjection(form, option) {
 
 }
 
+async function performJoin() {
+    clearTable("joinTablesContainer");
+    const selectedAttributes = getSelectedAttributes();
+    const metadata = selectedAttributes.split(', ').map(attribute => ({ name: attribute }));
+
+    const query = generateJoinQuery(selectedAttributes);
+    if (query == null) {
+        document.getElementById('joinResult').value = 'Please select at least one attribute.';
+    } else {
+        document.getElementById('joinResult').value = query;
+    }
+
+
+    try {
+        const response = await fetch(`/join/${query}`, { method: 'GET' });
+        const { data } = await response.json();
+
+        createTable(metadata, data,"Entries and User Combined Table",'joinTablesContainer');
+    } catch (err) {
+        console.error('Error fetching data:', err);
+    }
+}
+
+document.getElementById('joinForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    await performJoin();
+});
+
+
 // Generates query for projection
 function generateProjectQuery(tableName, formData) {
     // Filter out items with null values
@@ -463,14 +479,54 @@ function generateProjectQuery(tableName, formData) {
     return query;
 }
 
+function getSelectedAttributes() {
+    // Select checkboxes based on table source
+    const userAttributes = Array.from(document.querySelectorAll('input[name="attributes"]:checked'))
+        .filter(input => input.value.startsWith('Users'))
+        .map(input => input.value);
+
+    const entryAttributes = Array.from(document.querySelectorAll('input[name="attributes"]:checked'))
+        .filter(input => input.value.startsWith('EntryCreatedBy'))
+        .map(input => input.value);
+
+    // Combine attributes into a single string
+    const selectedAttributes = [...userAttributes, ...entryAttributes].join(', ');
+    return selectedAttributes;
+}
+
+function generateJoinQuery(selectedAttributes) {
+    // Check if no attributes were selected
+    if (!selectedAttributes) {
+        return null;
+    }
+
+    const selectedUsername = document.getElementById("usernameInput").value;
+    let query;
+    // Construct the SQL query
+    if (selectedUsername) {
+        query = `
+        SELECT ${selectedAttributes}
+        FROM Users
+        JOIN EntryCreatedBy
+        ON Users.username = EntryCreatedBy.username
+        WHERE Users.username = '${selectedUsername}'
+    `.trim();
+    } else {
+        query = `
+        SELECT ${selectedAttributes}
+        FROM Users
+        JOIN EntryCreatedBy
+        ON Users.username = EntryCreatedBy.username
+    `.trim();
+    }
+    return query;
+}
+
 
 // Populate both dropdowns on page load
-console.log('populating dropdown');
+
 populateDropdown('show', dropdownButton, dropdownMenu, options,
     selectedOptions, selectedOptionsDisplay, true);
-console.log('populated dropdown');
-populateDropdown('insert', insertDropdownButton, insertDropdownMenu, options,
-    insertSelectedOption, insertSelectedOptionsDisplay, false);
 populateDropdown('project', projectDropdownButton, projectDropdownMenu, options,
     projectSelectedOption, projectSelectedOptionsDisplay, true);
 
@@ -652,7 +708,6 @@ async function countDemotable() {
 // Initializes the webpage functionalities.
 // Add or remove event listeners based on the desired functionalities.
 window.onload = function () {
-    console.log("Starting");
     initializeAndInsertTables();
     checkDbConnection();
     fetchTableDataDemo();
