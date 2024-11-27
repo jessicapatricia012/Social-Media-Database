@@ -144,6 +144,30 @@
         <div id="insertPostMsg"></div>
     </form>
 
+    <br><hr><br> <!-- ========================== DELETE USER =============================================== -->
+
+    <h2>Delete Account</h2>
+    <div class = "deleteUserHeader" >
+    <p>Select an Account to Delete</p>
+    <button id = "selectAccount">Hide Table</button>
+    </div>
+
+    <table id = "deleteUserTable"> 
+        <thead>
+            <tr>
+                <th>Username</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class = "selectedDelete">Some User</td>
+            </tr>
+        </tbody>
+    </table>
+    <button id = "deleteButton">Delete</button>
+    <div id="deleteUserMsg"></div>
+
+
     <br><hr><br> <!-- ========================================================================= -->
 
     <h2> Insert Values into DemoTable </h2>
@@ -158,7 +182,7 @@
     <br><hr><br> <!-- UPDATE========================================================================= -->
     <h2>Update Attributes of User</h2>
     <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
-    <button onclick="displayTuplesForUpdate();">Show Tuples</button>
+    <button class = "showTup" onclick="displayTuplesForUpdate();">Show Tuples</button>
     <table id="updateTuplesTable">
         <thead>
             <tr>
@@ -217,6 +241,7 @@
 
     <!-- ===================================================================================== -->
     <!-- External JavaScript file that contains the functionality/logic for the operations above. -->
+     <script src = "delete.js"></script>
     <script src="scripts.js"></script>
     <script src="update.js"></script>
     <script src="selection.js"></script>

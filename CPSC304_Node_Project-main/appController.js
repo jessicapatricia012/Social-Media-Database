@@ -122,6 +122,18 @@ router.post('/insert-post' , async (req, res) => {
     }
 });
 
+router.post("/delete-user", async(req,res) =>{
+    const {username} = req.body;
+    const deleteResult = await appService.deleteUser(username);
+
+        if (deleteResult){
+            res.json({success:true});
+        } else{
+            res.status(500).json({success:false});
+        }
+});
+
+
 router.post("/insert-demotable", async (req, res) => {
     const { id, name } = req.body;
     const insertResult = await appService.insertDemotable(id, name);

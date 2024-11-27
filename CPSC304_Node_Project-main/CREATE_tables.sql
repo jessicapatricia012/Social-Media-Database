@@ -39,22 +39,22 @@ CREATE TABLE EntryCreatedBy(
 	entryID INTEGER PRIMARY KEY, 
 	dateCreated	DATE,
 	content	LONG,
-	username VARCHAR(50) REFERENCES Users(username)		
+	username VARCHAR(50) REFERENCES Users(username)	ON DELETE CASCADE
 );
 
 CREATE TABLE PostIn (
 	entryID	INTEGER	PRIMARY KEY,
 	title	VARCHAR(1000)	NOT NULL,
 	communityName	VARCHAR(50)	NOT NULL,
-	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy(entryID),
-	FOREIGN KEY (communityName) REFERENCES Communities(communityName)
+	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy(entryID) ON DELETE CASCADE,
+	FOREIGN KEY (communityName) REFERENCES Communities(communityName) ON DELETE CASCADE
 );
 
 CREATE TABLE CommentOn (
 	entryID	INTEGER	PRIMARY KEY,
 	onEntryID	INTEGER	NOT NULL,
-	FOREIGN KEY (onEntryID) REFERENCES EntryCreatedBy(entryID),
-	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy(entryID)
+	FOREIGN KEY (onEntryID) REFERENCES EntryCreatedBy(entryID) ON DELETE CASCADE,
+	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy(entryID) ON DELETE CASCADE
 );
  
 CREATE TABLE Chatroom (
@@ -116,8 +116,8 @@ CREATE TABLE JoinsCommunity(
 	username	VARCHAR(50),
 	communityName	VARCHAR(50),
 	PRIMARY KEY (username, communityName),
-	FOREIGN KEY (communityName) REFERENCES Communities(CommunityName),
-	FOREIGN KEY (username) REFERENCES Users(username)
+	FOREIGN KEY (communityName) REFERENCES Communities(CommunityName) ON DELETE CASCADE,
+	FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE
 );
  
 CREATE TABLE ImageContainedBy(

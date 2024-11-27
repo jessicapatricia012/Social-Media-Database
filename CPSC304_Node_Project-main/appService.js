@@ -178,7 +178,6 @@ async function insertUser(username,email, dateJoined, name){
     });
 }
 
-
 async function insertPost(user,title, community, content, date){
         return await withOracleDB(async (connection) => {
             try{
@@ -214,6 +213,24 @@ async function insertPost(user,title, community, content, date){
                 return false;
             }
         });
+}
+
+async function deleteUser(username){
+    return await withOracleDB(async (connection) => {
+        try{
+            const deleteResult = await connection.execute(
+                'DELETE FROM USERS WHERE username = :username',
+                [username],
+                {autoCommit:true}
+            );
+            console.log(deleteResult);
+            console.log("DELETE USER: Delete Succesful!");
+            return deleteResult.rowsAffected && deleteResult.rowsAffected > 0;
+        } catch (error){
+            console.log("DELETE POST: Fail", error);
+            return false;
+        }
+    });
 }
 
 async function updateUser(username, email, displayName, dateJoined) {
@@ -341,8 +358,6 @@ async function insertDemotable(id, name) {
 }
 
 
-
-
 module.exports = {
     testOracleConnection,
     fetchDemotableFromDb,
@@ -355,5 +370,6 @@ module.exports = {
     projectionTableFromDb,
     insertUser,
     selectAward,
-    insertPost
+    insertPost,
+    deleteUser
 };
