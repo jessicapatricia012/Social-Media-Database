@@ -305,6 +305,7 @@ function populateDropdown(sqlAction, button, menu, optionsArray, selectedArray, 
 
 // Make forms for inserting tables and their features
 // TODO: IMAGES AND VIDEOS HAVE NOT BEEN FIXED YET
+
 const featuresMap = {
     Awards: ['AwardType', 'value'],
     Chatroom: ['ChatroomID', 'Name'],
