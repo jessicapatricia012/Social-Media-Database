@@ -130,6 +130,7 @@ function createTable(metaData, tableData, tableTitle, tableID) {
 
     // FORMATTING TABLE HEADERS
     // Create table headers based on columns in the metaData
+    console.log(metaData);
     if (Array.isArray(metaData) && metaData.length > 0) {
         metaData.forEach((item) => {
             const th = document.createElement('th');
@@ -186,14 +187,13 @@ function createTable(metaData, tableData, tableTitle, tableID) {
 const options = [
     'Awards', 'Chatroom', 'CommentOn', 'Communities', 'EntryCreatedBy',
     'Follows', 'GivenToBy', 'Images', 'JoinsChatRoom', 'JoinsCommunity',
-    'MessagesSentByIn', 'PostIn', 'Users', 'UsersAge', 'Videos', 'Vote'
+    'MessagesSentByIn', 'PostIn', 'Users', 'Videos', 'Vote'
 ];
+
 // Dropdown for viewing table
 const dropdownButton = document.getElementById('dropdownButton');
 const dropdownMenu = document.getElementById('dropdownMenu');
 const selectedOptionsDisplay = document.getElementById('selectedOptions');
-
-// Array to store selected tables
 let selectedOptions = [];
 
 // Dropdown for inserting
@@ -307,10 +307,10 @@ function populateDropdown(sqlAction, button, menu, optionsArray, selectedArray, 
 // TODO: IMAGES AND VIDEOS HAVE NOT BEEN FIXED YET
 
 const featuresMap = {
-    Awards: ['AwardType', 'value'],
+    Award: ['AwardType', 'value'],
     Chatroom: ['ChatroomID', 'Name'],
     CommentOn: ['EntryID', 'OnEntryID'],
-    Communities: ['CommunityName', 'Rules', 'Description'],
+    Communities: ['CommunityName', 'Rule', 'Description'],
     EntryCreatedBy: ['EntryID', 'DateCreated', 'Content', 'Username'],
     Follows: ['FollowingUsername', 'FollowedUsername'],
     GivenToBy: ['awardType', 'username', 'entryID'],
@@ -319,9 +319,12 @@ const featuresMap = {
     JoinsCommunity: ['Username', 'CommunityName'],
     MessagesSentByIn: ['MessageID', 'DateSent', 'Content', 'Username', 'ChatroomID'],
     PostIn: ['EntryID', 'Title', 'CommunityName'],
-    Users: ['Username', 'Email', 'DateJoined', 'DisplayName', 'FollowingUsername', 'FollowedUsername'],
+    Users: ['Username', 'Email', 'DateJoined', 'DisplayName'],
+    UsersAge: ['dateJoined', 'age'],
     Videos: ['VideoURL', 'UploadDate'],
-    Vote: ['Username', 'EntryID', 'UpvoteOrDownVote']
+    Vote: ['Username', 'EntryID', 'UpvoteOrDownVote'],
+    ImageContainedBy: ['AttachmentID', 'imageFile', 'entryID', 'messageID'],
+    VideoContainedBy: ['AttachmentID', 'videoFile', 'entryID', 'messageID']
 };
 
 // Makes a submit button
@@ -377,7 +380,7 @@ function generateForm(option, tableName, sqlCommand) {
 
     switch (sqlCommand) {
         case 'insert':
-            submitButton.addEventListener('click', function() {
+            submitButton.addEventListener('click', function(event) {
 
                 // Collect form data into an array
                 const formData = [];
@@ -397,7 +400,7 @@ function generateForm(option, tableName, sqlCommand) {
             });
             break;
         case 'project':
-            submitButton.addEventListener('click', async function () {
+            submitButton.addEventListener('click', async function (event) {
                 await performProjection(form, option);
             });
     }
@@ -461,8 +464,10 @@ function generateProjectQuery(tableName, formData) {
 
 
 // Populate both dropdowns on page load
+console.log('populating dropdown');
 populateDropdown('show', dropdownButton, dropdownMenu, options,
     selectedOptions, selectedOptionsDisplay, true);
+console.log('populated dropdown');
 populateDropdown('insert', insertDropdownButton, insertDropdownMenu, options,
     insertSelectedOption, insertSelectedOptionsDisplay, false);
 populateDropdown('project', projectDropdownButton, projectDropdownMenu, options,
@@ -635,11 +640,12 @@ async function countDemotable() {
     }
 }
 
-// Toggle dropdown visibility on button click
-dropdownButton.addEventListener('click', () => {
-    dropdownMenu.style.display =
-        dropdownMenu.style.display === 'block' ? 'none' : 'block';
-});
+// // Toggle dropdown visibility on button click
+// dropdownButton.addEventListener('click', () => {
+//     console.log("clicked");
+//     dropdownMenu.style.display =
+//         dropdownMenu.style.display === 'block' ? 'none' : 'block';
+// });
 
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
