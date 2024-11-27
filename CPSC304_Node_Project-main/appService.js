@@ -208,12 +208,7 @@ async function updateUser(username, email, displayName, dateJoined) {
                 displayName = :displayName, 
                 dateJoined = TO_DATE(:dateJoined, 'YYYY-MM-DD')
             WHERE username = :username`,
-            {
-                username: username,
-                email: email,
-                displayName: displayName,
-                dateJoined: dateJoined           
-            },
+            [email, displayName, dateJoined, username],
             { autoCommit: true }
         );
         return result.rowsAffected && result.rowsAffected > 0;
@@ -249,6 +244,23 @@ async function selectAward(clauses) {
         const result = await connection.execute(
             sqlQuery,
             queryParams,
+            { autoCommit: true }
+        );
+        return result.rows;
+    }).catch(() => {
+        return false;
+    });
+}
+
+async function aggregateHaving() {
+    console.log('aggregateHaving appservice'); 
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            `SELECT username, COUNT(awardType)
+            FROM GivenToBy
+            GROUP BY username 
+            HAVING COUNT(awardType) >= 5`,
+            [],
             { autoCommit: true }
         );
         return result.rows;
@@ -345,5 +357,6 @@ module.exports = {
     fetchTableFromDb,
     insertUser,
     selectAward,
-    insertPost
+    insertPost,
+    aggregateHaving
 };

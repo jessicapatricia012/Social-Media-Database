@@ -44,7 +44,7 @@ async function displayTuplesForUpdate() {
     console.log('fetched:', responseData);
     content = responseData.data.rows;
 
-    // Always clear old, already fetched data before new fetching process.
+    // clear old data
     if (tableBody) {
         tableBody.innerHTML = '';
     }

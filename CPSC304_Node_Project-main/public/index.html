@@ -165,12 +165,38 @@
         <br><br>
         <button type="submit">Search</button>
     </form>
+     <!-- END OF SELECTION======================================================================== -->
 
 
 
 
 
-    <br><hr><br> <!-- END OF SELECTION======================================================================== -->
+
+
+
+    <br><hr><br> <!-- AGGREGATION WITH HAVING========================================================================= -->
+    <h2>Search for Users who has given at least 5 awards</h2>
+    <button id="aHShowTableBtn" onclick="generateAgregateHavingTable();">Show Table</button>
+
+    <table id="aggregateHavingTable" style="display: none">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Number of Awards Given</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- rows hre -->
+        </tbody>    
+    </table>
+    <br>
+    <div style="display: flex; gap: 10px;">
+        <button id="aHHideTableBtn" style="display: none" onclick="HideAgregateHavingTable();">Hide Table</button>
+        <button id="aHRefreshTableBtn" style="display: none" onclick="generateAgregateHavingTable();">Refresh</button>
+    </div>
+
+    <div id="aggregateHavingResultMsg"></div>
+    <br><hr><br> <!-- END OF AGGREGATION WITH HAVING======================================================================== -->
 
 
 
@@ -185,5 +211,7 @@
     <script src="scripts.js"></script>
     <script src="update.js"></script>
     <script src="selection.js"></script>
+    <script src="aggregateHaving.js"></script>
+</body>
 </body>
 </html>
