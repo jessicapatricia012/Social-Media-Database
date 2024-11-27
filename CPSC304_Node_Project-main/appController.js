@@ -25,6 +25,7 @@ router.post("/initiate_create_table", async (req, res) => {
     }
 });
 
+// may need to delete
 router.post("/insert_table", async (req, res) => {
     const initiateResult = await appService.insertTables();
     if (initiateResult) {
@@ -34,12 +35,11 @@ router.post("/insert_table", async (req, res) => {
     }
 });
 
-
-router.get('/projection/:query', async (req, res) => {
+// sends query to projection
+router.get('/send/:query', async (req, res) => {
     // Extract the query from the URL parameters.
     const queryParam = req.params.query;
 
-    // Log the received query.
     console.log('Received Query:', queryParam);
 
     if (!queryParam) {
@@ -62,39 +62,7 @@ router.get('/projection/:query', async (req, res) => {
     }
 });
 
-router.get('/join/:query', async (req, res) => {
-    // Extract the query from the URL parameters.
-    const queryParam = req.params.query;
-
-    // Log the received query.
-    console.log('Received Query:', queryParam);
-
-    if (!queryParam) {
-        return res.status(400).json({ error: 'Query parameter is required' });
-    }
-
-    try {
-        // Decode the query parameter (since it might be URL encoded).
-        const decodedQuery = decodeURIComponent(queryParam);
-        console.log("Decoded Query:", decodedQuery);
-
-        // Perform the database query with the decoded query string.
-        const tableContent = await appService.projectionTableFromDb(decodedQuery);
-
-        // Send the response with the data.
-        res.json({ data: tableContent });
-    } catch (err) {
-        console.error("Error processing query:", err.message);
-        res.status(500).json({ error: 'Error fetching data' });
-    }
-});
-
-
-router.get('/demotable', async (req, res) => {
-    const tableContent = await appService.fetchDemotableFromDb();
-    res.json({data: tableContent});
-});
-
+// Send query to get table
 router.get('/table/:name', async (req, res) => {
     const tableName = req.params.name;
 
@@ -107,24 +75,6 @@ router.get('/table/:name', async (req, res) => {
         res.json({ data: tableContent});
     } catch (err) {
         res.status(500).json({ error: 'Error fetching table data' });
-    }
-});
-
-router.post("/initiate-demotable", async (req, res) => {
-    const initiateResult = await appService.initiateDemotable();
-    if (initiateResult) {
-        res.json({ success: true });
-    } else {
-        res.status(500).json({ success: false });
-    }
-});
-
-router.post("/initiate-tables", async (req, res) => {
-    const initiateResult = await appService.initiateTables();
-    if (initiateResult) {
-        res.json({ success: true });
-    } else {
-        res.status(500).json({ success: false });
     }
 });
 
@@ -158,17 +108,6 @@ router.post("/delete-user", async(req,res) =>{
         } else{
             res.status(500).json({success:false});
         }
-});
-
-
-router.post("/insert-demotable", async (req, res) => {
-    const { id, name } = req.body;
-    const insertResult = await appService.insertDemotable(id, name);
-    if (insertResult) {
-        res.json({ success: true });
-    } else {
-        res.status(500).json({ success: false });
-    }
 });
 
 router.post("/update-user", async (req, res) => {
@@ -229,21 +168,5 @@ router.post("/division", async (req, res) => {
     }
    
 });
-
-// router.get('/count-demotable', async (req, res) => {
-//     const tableCount = await appService.countDemotable();
-//     if (tableCount >= 0) {
-//         res.json({ 
-//             success: true,  
-//             count: tableCount
-//         });
-//     } else {
-//         res.status(500).json({ 
-//             success: false, 
-//             count: tableCount
-//         });
-//     }
-// });
-
 
 module.exports = router;
