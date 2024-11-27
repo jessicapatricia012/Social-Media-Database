@@ -1,5 +1,27 @@
 /* Project Code*/
 
+// checks the connection to database
+async function checkDbConnection() {
+    const statusElem = document.getElementById('dbStatus');
+    const loadingGifElem = document.getElementById('loadingGif');
+
+    const response = await fetch('/check-db-connection', {
+        method: "GET"
+    });
+
+    // Hide the loading GIF once the response is received.
+    loadingGifElem.style.display = 'none';
+    // Display the statusElem's text in the placeholder.
+    statusElem.style.display = 'inline';
+
+    response.text()
+        .then((text) => {
+            statusElem.textContent = text;
+        })
+        .catch((error) => {
+            statusElem.textContent = 'connection timed out';  // Adjust error handling if required.
+        });
+}
 // Initializes database and inserts starting values
 async function initializeAndInsertTables() {
     await initializeTables();
@@ -22,7 +44,6 @@ async function initializeTables() {
     }
 }
 
-
 // This function inserts tables stated in INSERT_tables.sql
 async function insertTables() {
 
@@ -36,41 +57,6 @@ async function insertTables() {
         messageElement.textContent = "inserted values successfully!";
     } else {
         alert("Error inserting table!");
-    }
-}
-
-
-//TODO: Need to determine if we want to show DB connection status
-// This function checks the database connection and updates its status on the frontend.
-async function checkDbConnection() {
-    const statusElem = document.getElementById('dbStatus');
-    const loadingGifElem = document.getElementById('loadingGif');
-
-    const response = await fetch('/check-db-connection', {
-        method: "GET"
-    });
-
-    // Hide the loading GIF once the response is received.
-    loadingGifElem.style.display = 'none';
-    // Display the statusElem's text in the placeholder.
-    statusElem.style.display = 'inline';
-
-    response.text()
-        .then((text) => {
-            statusElem.textContent = text;
-        })
-        .catch((error) => {
-            statusElem.textContent = 'connection timed out';  // Adjust error handling if required.
-        });
-}
-
-// Clears all data in table
-function clearTable(tableID) {
-    const tablesContainer = document.getElementById(tableID);
-    if (tablesContainer) {
-        tablesContainer.innerHTML = '';
-    } else {
-        console.error("Tables container not found");
     }
 }
 
@@ -107,7 +93,6 @@ async function fetchAndDisplayUsers() {
         createTable(metaData, rows, tableTitle, 'showTablesContainer');
     });
 }
-
 
 // Function to dynamically create a table for a given table name and its data
 function createTable(metaData, tableData, tableTitle, tableID) {
@@ -181,7 +166,6 @@ function createTable(metaData, tableData, tableTitle, tableID) {
 // --------------------------------------------------------------------------------
 // MAKING DROPDOWN
 // --------------------------------------------------------------------------------
-// For dropdown menu
 const options = [
     'Award', 'Chatroom', 'CommentOn', 'Communities', 'EntryCreatedBy',
     'Follows', 'GivenToBy', 'Images', 'JoinsChatRoom', 'JoinsCommunity',
@@ -241,17 +225,6 @@ function configureListActions(sqlAction, li, optionText, selectedArray, multiSel
             // Fetch updated tables
             fetchTableData();
             break;
-
-        case 'insert':
-            // Single select dropdown
-            configureDropdown(li, optionText, selectedArray, multiSelect);
-            // Clear previous form
-            formContainer = document.getElementById("InsertRow");
-            formContainer.innerHTML = '';
-            // Generate form
-            generateForm(selectedArray[0], 'InsertRow', 'insert');
-            break;
-
         case 'project':
             // multi-select dropdown
             configureDropdown(li, optionText, selectedArray, multiSelect);
@@ -291,9 +264,17 @@ function populateDropdown(sqlAction, button, menu, optionsArray, selectedArray, 
     });
 }
 
-// Make forms for inserting tables and their features
-// TODO: IMAGES AND VIDEOS HAVE NOT BEEN FIXED YET
+// Populate both dropdowns on page load
+populateDropdown('show', dropdownButton, dropdownMenu, options,
+    selectedOptions, selectedOptionsDisplay, true);
+populateDropdown('project', projectDropdownButton, projectDropdownMenu, options,
+    projectSelectedOption, projectSelectedOptionsDisplay, true);
 
+// --------------------------------------------------------------------------------
+// END OF DROPDOWN
+// --------------------------------------------------------------------------------
+
+// Make forms for inserting tables and their features
 const featuresMap = {
     Award: ['AwardType', 'value'],
     Chatroom: ['ChatroomID', 'Name'],
@@ -365,28 +346,8 @@ function generateForm(option, tableName, sqlCommand) {
     });
 
     formContainer.appendChild(form);
-
+    //configure submit button
     switch (sqlCommand) {
-        case 'insert':
-            submitButton.addEventListener('click', function(event) {
-
-                // Collect form data into an array
-                const formData = [];
-                const formElements = form.elements;
-
-                for (let element of formElements) {
-                    if (element.type !== 'submit' && element.type !== 'button') {
-                        formData.push({
-                            name: element.name,
-                            value: element.value || null
-                        });
-                    }
-                }
-                // Log the form data to the console
-                console.log("insert");
-                console.log(formData);
-            });
-            break;
         case 'project':
             submitButton.addEventListener('click', async function (event) {
                 await performProjection(form, option);
@@ -398,7 +359,6 @@ function generateForm(option, tableName, sqlCommand) {
 // Gathers data in the form, performs projection, and updates html
 async function performProjection(form, option) {
     clearTable("projectionTablesContainer");
-    // tablesContainer.innerHTML = "";
 
     // Collect form data into an array
     const formData = [];
@@ -418,7 +378,7 @@ async function performProjection(form, option) {
 
     // Make the request to the server with query
     try {
-        const response = await fetch(`/projection/${query}`, { method: 'GET' });
+        const response = await fetch(`/send/${query}`, { method: 'GET' });
         const { data } = await response.json();
         const filteredData = formData.filter(item => item.value !== null);
         filteredData.sort((a, b) => Number(a.value) - Number(b.value));
@@ -433,6 +393,7 @@ async function performProjection(form, option) {
 
 }
 
+// Makes a query for join and sends it to oracle
 async function performJoin() {
     clearTable("joinTablesContainer");
     const selectedAttributes = getSelectedAttributes();
@@ -445,9 +406,8 @@ async function performJoin() {
         document.getElementById('joinResult').value = query;
     }
 
-
     try {
-        const response = await fetch(`/join/${query}`, { method: 'GET' });
+        const response = await fetch(`/send/${query}`, { method: 'GET' });
         const { data } = await response.json();
 
         createTable(metadata, data,"Entries and User Combined Table",'joinTablesContainer');
@@ -456,11 +416,27 @@ async function performJoin() {
     }
 }
 
+// puts all the selected options into a list for join
+function getSelectedAttributes() {
+    // Select checkboxes based on table source
+    const userAttributes = Array.from(document.querySelectorAll('input[name="attributes"]:checked'))
+        .filter(input => input.value.startsWith('Users'))
+        .map(input => input.value);
+
+    const entryAttributes = Array.from(document.querySelectorAll('input[name="attributes"]:checked'))
+        .filter(input => input.value.startsWith('EntryCreatedBy'))
+        .map(input => input.value);
+
+    // Combine attributes into a single string
+    const selectedAttributes = [...userAttributes, ...entryAttributes].join(', ');
+    return selectedAttributes;
+}
+
+// Makes submit button for Join
 document.getElementById('joinForm').addEventListener('submit', async function (event) {
     event.preventDefault();
     await performJoin();
 });
-
 
 // Generates query for projection
 function generateProjectQuery(tableName, formData) {
@@ -479,21 +455,7 @@ function generateProjectQuery(tableName, formData) {
     return query;
 }
 
-function getSelectedAttributes() {
-    // Select checkboxes based on table source
-    const userAttributes = Array.from(document.querySelectorAll('input[name="attributes"]:checked'))
-        .filter(input => input.value.startsWith('Users'))
-        .map(input => input.value);
-
-    const entryAttributes = Array.from(document.querySelectorAll('input[name="attributes"]:checked'))
-        .filter(input => input.value.startsWith('EntryCreatedBy'))
-        .map(input => input.value);
-
-    // Combine attributes into a single string
-    const selectedAttributes = [...userAttributes, ...entryAttributes].join(', ');
-    return selectedAttributes;
-}
-
+// Generates query for join
 function generateJoinQuery(selectedAttributes) {
     // Check if no attributes were selected
     if (!selectedAttributes) {
@@ -522,14 +484,6 @@ function generateJoinQuery(selectedAttributes) {
     return query;
 }
 
-
-// Populate both dropdowns on page load
-
-populateDropdown('show', dropdownButton, dropdownMenu, options,
-    selectedOptions, selectedOptionsDisplay, true);
-populateDropdown('project', projectDropdownButton, projectDropdownMenu, options,
-    projectSelectedOption, projectSelectedOptionsDisplay, true);
-
 // This function resets the database
 async function resetDatabase() {
     const response = await fetch("/initiate_create_table", {
@@ -547,31 +501,14 @@ async function resetDatabase() {
     }
 }
 
-//EXAMPLE WILL DELETE LATER
-// Fetches data from the demotable and displays it.
-async function fetchAndDisplayUsersDemo() {
-    const tableElement = document.getElementById('demotable');
-    const tableBody = tableElement.querySelector('tbody');
-
-    const response = await fetch('/demotable', {
-        method: 'GET'
-    });
-
-    const responseData = await response.json();
-    const demotableContent = responseData.data;
-
-    // Always clear old, already fetched data before new fetching process.
-    if (tableBody) {
-        tableBody.innerHTML = '';
+// Clears all data in table
+function clearTable(tableID) {
+    const tablesContainer = document.getElementById(tableID);
+    if (tablesContainer) {
+        tablesContainer.innerHTML = '';
+    } else {
+        console.error("Tables container not found");
     }
-
-    demotableContent.forEach(user => {
-        const row = tableBody.insertRow();
-        user.forEach((field, index) => {
-            const cell = row.insertCell(index);
-            cell.textContent = field;
-        });
-    });
 }
 
 //Inserts new User into Users table
@@ -650,59 +587,6 @@ async function insertPost(event){
     }
 }
 
-// Inserts new records into the demotable.
-async function insertDemotable(event) {
-    event.preventDefault();
-
-    const idValue = document.getElementById('insertId').value;
-    const nameValue = document.getElementById('insertName').value;
-
-    const response = await fetch('/insert-demotable', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            id: idValue,
-            name: nameValue
-        })
-    });
-
-    const responseData = await response.json();
-    const messageElement = document.getElementById('insertResultMsg');
-
-    if (responseData.success) {
-        messageElement.textContent = "Data inserted successfully!";
-        fetchTableData();
-    } else {
-        messageElement.textContent = "Error inserting data!";
-    }
-}
-
-// Counts rows in the demotable.
-// Modify the function accordingly if using different aggregate functions or procedures.
-async function countDemotable() {
-    const response = await fetch("/count-demotable", {
-        method: 'GET'
-    });
-
-    const responseData = await response.json();
-    const messageElement = document.getElementById('countResultMsg');
-
-    if (responseData.success) {
-        const tupleCount = responseData.count;
-        messageElement.textContent = `The number of tuples in demotable: ${tupleCount}`;
-    } else {
-        alert("Error in count demotable!");
-    }
-}
-
-// // Toggle dropdown visibility on button click
-// dropdownButton.addEventListener('click', () => {
-//     console.log("clicked");
-//     dropdownMenu.style.display =
-//         dropdownMenu.style.display === 'block' ? 'none' : 'block';
-// });
 
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
@@ -710,21 +594,12 @@ async function countDemotable() {
 window.onload = function () {
     initializeAndInsertTables();
     checkDbConnection();
-    fetchTableDataDemo();
     fetchTableData();
     document.getElementById("resetDatabaseButton").addEventListener("click", resetDatabase);
     document.getElementById("initTable").addEventListener("click", initializeAndInsertTables);
     document.getElementById("insertUser").addEventListener("submit", insertUser);
-    document.getElementById("insertDemotable").addEventListener("submit", insertDemotable);
     document.getElementById("insertPost").addEventListener("submit",insertPost);
 };
-
-// EXAMPLE FOR FETCHING DEMOTABLE
-// General function to refresh the displayed table data. 
-// You can invoke this after any table-modifying operation to keep consistency.
-function fetchTableDataDemo() {
-    fetchAndDisplayUsersDemo();
-}
 
 //Currently in use
 // Used to fetch and display table data.
