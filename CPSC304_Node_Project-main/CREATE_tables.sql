@@ -39,7 +39,7 @@ CREATE TABLE EntryCreatedBy(
 	entryID INTEGER PRIMARY KEY, 
 	dateCreated	DATE,
 	content	LONG,
-	username VARCHAR(50) REFERENCES Users(username)		
+	username VARCHAR(50) REFERENCES Users(username)	
 );
 
 CREATE TABLE PostIn (
