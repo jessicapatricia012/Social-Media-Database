@@ -127,8 +127,12 @@ async function initializeCreateTables() {
                         const result = await connection.execute(statement);
                         await connection.execute('COMMIT');
                     } catch (error) {
-                        // Simplified error handling (let console.error below catch it)
+                        if (error.message.includes('ORA-00942')) {
+                            console.warn(`Table already exists, skipping: ${statement}`);
+                        } else {
+                            // Re-throw error if it's not a specific known error
                             throw error;
+                        }
                     }
                 }
             }
@@ -338,27 +342,17 @@ async function insertDemotable(id, name) {
 
 
 
-async function countDemotable() {
-    return await withOracleDB(async (connection) => {
-        const result = await connection.execute('SELECT Count(*) FROM DEMOTABLE');
-        return result.rows[0][0];
-    }).catch(() => {
-        return -1;
-    });
-}
-
 
 module.exports = {
     testOracleConnection,
     fetchDemotableFromDb,
     initiateDemotable, 
     insertDemotable, 
-    updateUser, 
-    countDemotable,
+    updateUser,
     initializeCreateTables,
     insertTables,
     fetchTableFromDb,
-    projectionTableFromDb
+    projectionTableFromDb,
     insertUser,
     selectAward,
     insertPost

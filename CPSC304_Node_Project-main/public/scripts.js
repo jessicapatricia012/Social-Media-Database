@@ -70,7 +70,6 @@ function clearTable(tableID) {
         tablesContainer.innerHTML = '';
     } else {
         console.error("Tables container not found");
-        return;
     }
 }
 
@@ -78,21 +77,13 @@ function clearTable(tableID) {
 async function fetchAndDisplayUsers() {
     console.log("FetchingAndDisplay STARTED");
     const content = [];
-    const tablesContainer = document.getElementById('showTablesContainer');
 
     // Clear the entire container before new fetching process
     clearTable('showTablesContainer');
 
     // Continue with fetching and displaying the data
     for (const option of selectedOptions) {
-        let sql = "";
-        if (option == 'image') {
-            sql = `/table/imagecontainedby`;
-        } else if (option == 'video') {
-            sql = `/table/videocontainedby`;
-        } else {
-            sql = `/table/${option}`;
-        }
+        let sql = `/table/${option}`;
 
         try {
             console.log('SCRIPT-FETCH: fetching all users', sql);
@@ -195,13 +186,14 @@ function createTable(metaData, tableData, tableTitle, tableID) {
 const options = [
     'Awards', 'Chatroom', 'CommentOn', 'Communities', 'EntryCreatedBy',
     'Follows', 'GivenToBy', 'Images', 'JoinsChatRoom', 'JoinsCommunity',
-    'MessagesSentByIn', 'PostIn', 'Users', 'Videos', 'Vote'
+    'MessagesSentByIn', 'PostIn', 'Users', 'UsersAge', 'Videos', 'Vote'
 ];
-
 // Dropdown for viewing table
 const dropdownButton = document.getElementById('dropdownButton');
 const dropdownMenu = document.getElementById('dropdownMenu');
 const selectedOptionsDisplay = document.getElementById('selectedOptions');
+
+// Array to store selected tables
 let selectedOptions = [];
 
 // Dropdown for inserting
@@ -292,8 +284,6 @@ function configureListActions(sqlAction, li, optionText, selectedArray, multiSel
 
 }
 
-
-
 // Populate the dropdown
 function populateDropdown(sqlAction, button, menu, optionsArray, selectedArray, displayElement, multiSelect = true) {
     optionsArray.forEach(optionText => {
@@ -315,6 +305,7 @@ function populateDropdown(sqlAction, button, menu, optionsArray, selectedArray, 
 
 // Make forms for inserting tables and their features
 // TODO: IMAGES AND VIDEOS HAVE NOT BEEN FIXED YET
+
 const featuresMap = {
     Awards: ['AwardType', 'value'],
     Chatroom: ['ChatroomID', 'Name'],
@@ -386,7 +377,7 @@ function generateForm(option, tableName, sqlCommand) {
 
     switch (sqlCommand) {
         case 'insert':
-            submitButton.addEventListener('click', function(event) {
+            submitButton.addEventListener('click', function() {
 
                 // Collect form data into an array
                 const formData = [];
@@ -406,7 +397,7 @@ function generateForm(option, tableName, sqlCommand) {
             });
             break;
         case 'project':
-            submitButton.addEventListener('click', async function (event) {
+            submitButton.addEventListener('click', async function () {
                 await performProjection(form, option);
             });
     }
@@ -415,7 +406,6 @@ function generateForm(option, tableName, sqlCommand) {
 
 // Gathers data in the form, performs projection, and updates html
 async function performProjection(form, option) {
-    const tablesContainer = document.getElementById("projectionTablesContainer");
     clearTable("projectionTablesContainer");
     // tablesContainer.innerHTML = "";
 
@@ -443,7 +433,6 @@ async function performProjection(form, option) {
         filteredData.sort((a, b) => Number(a.value) - Number(b.value));
         const formDataWithoutValue = filteredData.map(({ value, ...rest }) => rest);
         console.log("FORMDATAWITHOUTVALUE: ", formDataWithoutValue);
-        const names = formDataWithoutValue.map(item => item.name);
 
         // update HTML
         createTable(formDataWithoutValue, data, option, "projectionTablesContainer");
@@ -470,6 +459,7 @@ function generateProjectQuery(tableName, formData) {
     return query;
 }
 
+
 // Populate both dropdowns on page load
 populateDropdown('show', dropdownButton, dropdownMenu, options,
     selectedOptions, selectedOptionsDisplay, true);
@@ -478,7 +468,6 @@ populateDropdown('insert', insertDropdownButton, insertDropdownMenu, options,
 populateDropdown('project', projectDropdownButton, projectDropdownMenu, options,
     projectSelectedOption, projectSelectedOptionsDisplay, true);
 
-// TODO: RESET button seems to be buggy
 // This function resets the database
 async function resetDatabase() {
     const response = await fetch("/initiate_create_table", {
@@ -493,26 +482,6 @@ async function resetDatabase() {
         console.log("Reset Successful");
     } else {
         alert("Error restarting table!");
-    }
-}
-
-/* DEMO/TEMPLATE CODE */
-
-
-// EXAMPLE WILL DELETE LATER
-// This function resets or initializes the demotable.
-async function resetDemotable() {
-    const response = await fetch("/initiate-demotable", {
-        method: 'POST'
-    });
-    const responseData = await response.json();
-
-    if (responseData.success) {
-        const messageElement = document.getElementById('resetDatabaseResultMsg');
-        messageElement.textContent = "demotable initiated successfully!";
-        fetchTableDataDemo();
-    } else {
-        alert("Error initiating table!");
     }
 }
 
@@ -666,65 +635,11 @@ async function countDemotable() {
     }
 }
 
-// For dropdown menu
-const options = [
-    'Awards', 'Chatroom', 'CommentOn', 'Communities', 'EntryCreatedBy',
-    'Follows', 'GivenToBy', 'Images', 'JoinsChatRoom', 'JoinsCommunity',
-    'MessagesSentByIn', 'PostIn', 'Users', 'UsersAge', 'Videos', 'Vote'
-];
-
-const dropdownButton = document.getElementById('dropdownButton');
-const dropdownMenu = document.getElementById('dropdownMenu');
-const selectedOptionsDisplay = document.getElementById('selectedOptions');
-
-// Array to store selected tables
-let selectedOptions = [];
-
-// Populate the dropdown
-function populateDropdown(optionsArray) {
-    optionsArray.forEach(optionText => {
-        const li = document.createElement('li');
-        li.textContent = optionText;
-
-        li.addEventListener('click', () => {
-            li.classList.toggle('selected');
-            if (li.classList.contains('selected')) {
-                selectedOptions.push(optionText);
-            } else {
-                const index = selectedOptions.indexOf(optionText);
-                if (index > -1) {
-                    selectedOptions.splice(index, 1);
-                }
-            }
-
-            // Update the dropdown and data tables
-            updateSelectedOptions();
-            fetchTableData2();
-
-            dropdownMenu.style.display = 'none';
-        });
-
-        dropdownMenu.appendChild(li);
-    });
-}
-
-// Update the displayed selected options
-function updateSelectedOptions() {
-    if (selectedOptions.length > 0) {
-        selectedOptionsDisplay.textContent = selectedOptions.join(', ');
-    } else {
-        selectedOptionsDisplay.textContent = 'None';
-    }
-}
-
 // Toggle dropdown visibility on button click
 dropdownButton.addEventListener('click', () => {
     dropdownMenu.style.display =
         dropdownMenu.style.display === 'block' ? 'none' : 'block';
 });
-
-// Populate the dropdown on page load
-populateDropdown(options);
 
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
@@ -739,7 +654,6 @@ window.onload = function () {
     document.getElementById("initTable").addEventListener("click", initializeAndInsertTables);
     document.getElementById("insertUser").addEventListener("submit", insertUser);
     document.getElementById("insertDemotable").addEventListener("submit", insertDemotable);
-    document.getElementById("countDemotable").addEventListener("click", countDemotable);
     document.getElementById("insertPost").addEventListener("submit",insertPost);
 };
 

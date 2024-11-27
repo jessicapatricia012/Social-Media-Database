@@ -25,13 +25,13 @@ PC related');
 INSERT INTO COMMUNITIES(COMMUNITYNAME, RULE, DESCRIPTION) VALUES
 ('Math', '1. No discussing other subjects\n 2. No Physics discussion...' , 'Discuss anything
 Math here!');
-INSERT INTO COMMUNITIES(COMMUNITYNAME, RULES, DESCRIPTION)
+INSERT INTO COMMUNITIES(COMMUNITYNAME, RULE, DESCRIPTION)
 VALUES ('CSCareers', '1. No Grifting\n 2. No Politics...', 'Ask industry Professionals about CS
 career');
-INSERT INTO COMMUNITIES(COMMUNITYNAME, RULES, DESCRIPTION)
+INSERT INTO COMMUNITIES(COMMUNITYNAME, RULE, DESCRIPTION)
 VALUES ('AMA', '1. No boring questions\n 2. Be original...', 'Place for interesting people to answer
 questions');
-INSERT INTO COMMUNITIES(COMMUNITYNAME, RULES, DESCRIPTION)
+INSERT INTO COMMUNITIES(COMMUNITYNAME, RULE, DESCRIPTION)
 VALUES ('Gaming', '1. Gaming topics only\n 2. No Politics...', 'Discuss the latest gaming news
 here!');
 
