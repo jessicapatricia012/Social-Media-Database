@@ -76,15 +76,6 @@ async function testOracleConnection() {
     });
 }
 
-async function fetchDemotableFromDb() {
-    return await withOracleDB(async (connection) => {
-        const result = await connection.execute('SELECT * FROM DEMOTABLE');
-        return result.rows;
-    }).catch(() => {
-        return [];
-    });
-}
-
 async function fetchTableFromDb(table) {
     return await withOracleDB(async (connection) => {
         const sql = `SELECT * FROM ${table}`;
@@ -96,8 +87,8 @@ async function fetchTableFromDb(table) {
     });
 }
 
-// Assuming this function executes the SQL query passed to it.
-async function projectionTableFromDb(query) {
+// Function executes the SQL query passed to it and returns the data.
+async function getTableFromDb(query) {
     return await withOracleDB(async (connection) => {
         console.log("Executing SQL:", query);
         try {
@@ -111,6 +102,7 @@ async function projectionTableFromDb(query) {
     });
 }
 
+// Function intializes data tables
 async function initializeCreateTables() {
     return await withOracleDB(async (connection) => {
         const fs = require('fs');
@@ -259,14 +251,10 @@ async function updateUser(username, email, displayName, dateJoined) {
                 displayName = :displayName, 
                 dateJoined = TO_DATE(:dateJoined, 'YYYY-MM-DD')
             WHERE username = :username`,
-            {
-                username: username,
-                email: email,
-                displayName: displayName,
-                dateJoined: dateJoined           
-            },
+            [email, displayName, dateJoined, username],
             { autoCommit: true }
         );
+        // console.log(typeof(email));
         return result.rowsAffected && result.rowsAffected > 0;
         });
     } catch (error) {
@@ -280,10 +268,10 @@ async function updateUser(username, email, displayName, dateJoined) {
 
 
 async function selectAward(clauses) {
-    console.log('search appservice'); //not called
+    console.log('search appservice'); 
     return await withOracleDB(async (connection) => {
-        console.log('search appservice'); //not called
-        let sqlQuery = 'SELECT * FROM AWARDS WHERE ';
+        console.log(clauses); 
+        let sqlQuery = 'SELECT * FROM AWARD WHERE ';
         const queryParams = {};
         
         let count = 0;
@@ -291,17 +279,62 @@ async function selectAward(clauses) {
             if (count > 0) 
                 sqlQuery += ` ${clause.operator} `; //AND/OR added betwwen clauses
 
-            const a = `:${clause.attribute}_${index}`;
-            sqlQuery += `${clause.attribute} = ${a}`;
+            const a = `${clause.attribute}_${index}`;
+            sqlQuery += `UPPER(${clause.attribute}) = UPPER(:${a})`;
             queryParams[a] = clause.value;
             count++;
         });
-            
+        console.log(sqlQuery);   
+        // console.log(typeof(queryParams[0]));   
+        console.log(queryParams);  
+        // console.log(sqlQuery);   
         const result = await connection.execute(
             sqlQuery,
             queryParams,
             { autoCommit: true }
         );
+        console.log(result);
+        console.log(result.rows);
+        return result.rows;
+    }).catch(() => {
+        return false;
+    });
+}
+
+async function aggregateHaving() {
+    console.log('aggregateHaving appservice'); 
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            `SELECT username, COUNT(awardType)
+            FROM GivenToBy
+            GROUP BY username 
+            HAVING COUNT(awardType) >= 5`,
+            [],
+            { autoCommit: true }        
+        );
+        return result.rows;
+    }).catch(() => {
+        return false;
+    });
+}
+
+async function division() {
+    console.log('division appservice'); 
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute( 
+            `SELECT username, displayName
+            FROM Users u
+            WHERE NOT EXISTS 
+                ((SELECT C.communityname
+                FROM Communities C)
+                MINUS
+                (SELECT j.communityName
+                FROM JoinsCommunity j
+                WHERE j.username = u.username))`,
+            [],
+            { autoCommit: true }
+        );
+        console.log(result); // empty []
         return result.rows;
     }).catch(() => {
         return false;
@@ -338,54 +371,19 @@ async function insertTables() {
     });
 }
 
-async function initiateDemotable() {
-    return await withOracleDB(async (connection) => {
-        try {
-            await connection.execute(`DROP TABLE DEMOTABLE`);
-        } catch(err) {
-            console.log('Table might not exist, proceeding to create...');
-        }
-
-        const result = await connection.execute(`
-            CREATE TABLE DEMOTABLE (
-                id NUMBER PRIMARY KEY,
-                name VARCHAR2(20)
-            )
-        `);
-        return true;
-    }).catch(() => {
-        return false;
-    });
-}
-
-async function insertDemotable(id, name) {
-    return await withOracleDB(async (connection) => {
-        const result = await connection.execute(
-            `INSERT INTO DEMOTABLE (id, name) VALUES (:id, :name)`,
-            [id, name],
-            { autoCommit: true }
-        );
-
-        return result.rowsAffected && result.rowsAffected > 0;
-    }).catch(() => {
-        return false;
-    });
-}
-
-
 module.exports = {
     testOracleConnection,
-    fetchDemotableFromDb,
-    initiateDemotable, 
-    insertDemotable, 
     updateUser,
     initializeCreateTables,
     insertTables,
     fetchTableFromDb,
-    projectionTableFromDb,
+    projectionTableFromDb: getTableFromDb,
     insertUser,
     selectAward,
     insertPost,
     deleteUser,
-    fetchNumPostUser
+    fetchNumPostUser,
+    aggregateHaving,
+    deleteUser,
+    division
 };

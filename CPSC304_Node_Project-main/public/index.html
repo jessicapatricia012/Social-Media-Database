@@ -24,7 +24,6 @@
         <img id="loadingGif" class="loading-gif" src="loading_100px.gif" alt="Loading...">
     </h3>
 
-    <h3>Don't need this but keeping it just in case for now. Initializes on startup</h3>
     <h2>Initialize tables</h2>
     <p>Initialize Tables.</p>
     <button id="initTable"> initialize </button> <br>
@@ -50,7 +49,7 @@
 
     </div>
 
-    <br><hr><br> <!-- ========================================================================= -->
+    <br><hr><br> <!-- Projection ========================================================================= -->
 
     <h1>Projection</h1>
     <h2> Choose tables to project </h2>
@@ -67,28 +66,58 @@
     <form id= "projectRow">
         <!-- Form will be dynamically created-->
     </form>
-        <div id="projectionTablesContainer">
-            <table id="projectionTables">
-                <thead></thead>
-                <tbody></tbody>
-            </table>
+    <div id="projectionTablesContainer">
+        <table id="projectionTables">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
 
-        </div>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <p>Result is being printed into console. Need to complete insert function<p>
-    <h2> Insert Values into Database </h2>
-    <div class="insertDropdown">
-        <button id="insertDropdownButton">Select Tables</button>
-        <ul id="insertDropdownMenu" class="dropdown-menu">
-            <!-- Options will be dynamically populated -->
-        </ul>
     </div>
-    <h3><span id="insertSelectedOptions"></span></h3>
-    <form id= "InsertRow">
-        <!-- Form will be dynamically created-->
+
+    <br><hr><br> <!-- Join ========================================================================= -->
+
+    <h2> Look at Entries created by a user</h2>
+    <form id="joinForm">
+        <h3>Select Attributes to Include:</h3>
+        <!--User check boxes-->
+        <fieldset>
+            <legend>Users Table</legend>
+            <input type="checkbox" id="joinUsername" name="attributes" value="Users.username">
+            <label for="joinUsername">Username</label><br>
+            <input type="checkbox" id="joinEmail" name="attributes" value="Users.email">
+            <label for="joinEmail">Email</label><br>
+            <input type="checkbox" id="joinDisplayName" name="attributes" value="Users.displayName">
+            <label for="joinDisplayName">Display Name</label><br>
+            <input type="checkbox" id="joinDateJoined" name="attributes" value="Users.dateJoined">
+            <label for="joinDateJoined">Date Joined</label><br>
+        </fieldset>
+        <!--Entry check boxes-->
+        <fieldset>
+            <legend>EntryCreatedBy Table</legend>
+            <input type="checkbox" id="JoinEntryID" name="attributes" value="EntryCreatedBy.entryID">
+            <label for="joinEntryID">Entry ID</label><br>
+            <input type="checkbox" id="joinDateCreated" name="attributes" value="EntryCreatedBy.dateCreated">
+            <label for="joinDateCreated">Date Created</label><br>
+            <input type="checkbox" id="joinContent" name="attributes" value="EntryCreatedBy.content">
+            <label for="joinContent">Content</label><br>
+        </fieldset>
+        <p>Write down which user you would like to preview</p>
+        <input type="text" id="usernameInput" placeholder="Enter username">
+
+        <!-- button to call join-->
+        <button id= "joinButton">Submit</button>
     </form>
+    <div id="joinResult"></div>
+    <!--table to show result-->
+    <div id="joinTablesContainer">
+        <table id="joinTables">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+
+
 
     <br><hr><br> <!-- ========================================================================= -->
 
@@ -97,23 +126,6 @@
     <button id="resetDatabaseButton"> Reset </button>
     <div id="resetDatabaseResultMsg"></div>
 
-    <br><hr><br> <!-- ========================================================================= -->
-    <h1>DEMO: Will need to delete this later but kept to see example html</h1>
-    <br><hr><br> <!-- ========================================================================= -->
-    <!-- Show 'Demotable'.
-        Data will be fetched and inserted here dynamically using JavaScript. -->
-    <h2>Show Demotable</h2>
-    <table id="demotable">
-        <thead>
-        <tr>
-            <!--Table head, need to be adjusted accordingly to align with your own.-->
-            <th>ID</th>
-            <th>Name</th>
-        </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
     <br><hr><br> <!-- ========================================================================= -->
 
     <h2>Create Account</h2>
@@ -192,22 +204,16 @@
     <div id="refreshMsg"></div>
 
 
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <h2> Insert Values into DemoTable </h2>
-    <form id="insertDemotable">
-        ID: <input type="number" id="insertId" placeholder="Enter ID" required> <br><br>
-        Name: <input type="text" id="insertName" placeholder="Enter Name" maxlength="20"> <br><br>
-
-        <button type="submit"> insert </button> <br>
-    </form>
-    <div id="insertResultMsg"></div>
 
     <br><hr><br> <!-- UPDATE========================================================================= -->
-    <h2>Update Attributes of User</h2>
-    <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
-    <button class = "showTup" onclick="displayTuplesForUpdate();">Show Tuples</button>
-    <table id="updateTuplesTable">
+    <h2>Update User's Info</h2>
+    <button id = "updateShowBtn" onclick="displayTuplesForUpdate();">Show Users</button>
+    <div style="display: flex; gap: 10px;">
+        <button id="updateHideBtn" style="display: none" onclick="HideUpdateTable();">Hide Table</button>
+        <button id="updateRefreshBtn" style="display: none" onclick="displayTuplesForUpdate();">Refresh</button>
+    </div>
+    <br>
+    <table id="updateTuplesTable" style="display: none;">
         <thead>
             <tr>
                 <th>Username</th>
@@ -219,14 +225,15 @@
         <tbody>
         </tbody>    
     </table>
+
     <div>
-        <h4 id="selectARowMsg"> Select a row </h4> 
-        <h4 id="updateUsername"></h4> 
+        <h4 id="selectARowMsg" style="display: none;"> Select a row </h4> 
     </div>
-    <form id="updateDemotable" style="display: none;" onsubmit="updateUser(event)">
-        Email: <input type="text" id="updateEmail" maxlength="50"> <br>
+    <form id="updateForm" style="display: none;" onsubmit="updateUser(event)">
+        Username: <input type="text" id="updateUsername" readonly> <br>
+        Email (this has to be unique): <input type="text" id="updateEmail" maxlength="50"> <br>
         DisplayName: <input type="text" id="updateDisplayName" required> <br>
-        Date Joined: <input type="date" id="updateDateJoined" required> <br>
+        Date Joined: <input type="date" id="updateDateJoined" readonly> <br>
         <button type="submit" > update </button> <br>
     </form>
     <div id="updateNameResultMsg"></div>
@@ -237,23 +244,98 @@
 
 
     <br><hr><br> <!-- SELECTION========================================================================= -->
-    <h2>Selection: Search Award</h2>
+    <h2>Search Award</h2>
     <p>clauses will be read from top to bottom (first AND/OR second) AND/OR third ...) </p>
 
     <form id="selectionForm" onsubmit="searchAward(event)">
         <div id="clausesContainer">
             <!-- Conditions will be dynamically added here -->
         </div>
-        <button type="button" id="addClauseButton" onclick="addClause();" >Add Clause</button> 
+        <div style="display: flex; gap: 10px;">
+            <button type="button" id="addClauseButton" onclick="addClause();" >Add Clause</button>
+            <button type="button" id="clearClauseButton" onclick="clearClause();" style="display: none;">Clear</button> 
+        </div>
         <br><br>
-        <button type="submit">Search</button>
+        <button id='selectionSearchBtn' type="submit" style="display: none;">Search</button>
+
+
     </form>
+    <table id="selectionTable" style="display: none">
+        <thead>
+            <tr>
+                <th>Award Type</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- rows hre -->
+        </tbody>    
+    </table>
+    <br>
+    <div id="selectionResultMsg"></div>
+     <!-- END OF SELECTION======================================================================== -->
 
 
 
 
 
-    <br><hr><br> <!-- END OF SELECTION======================================================================== -->
+    <br><hr><br> <!-- AGGREGATION WITH HAVING========================================================================= -->
+    <h2>Search for Users who has given at least 5 awards</h2>
+    <button id="aHShowTableBtn" onclick="generateAgregateHavingTable();">Show Table</button>
+    <div style="display: flex; gap: 10px;">
+        <button id="aHHideTableBtn" style="display: none" onclick="HideAgregateHavingTable();">Hide Table</button>
+        <button id="aHRefreshTableBtn" style="display: none" onclick="generateAgregateHavingTable();">Refresh</button>
+    </div>
+    <br>
+    <table id="aggregateHavingTable" style="display: none">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Number of Awards Given</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- rows hre -->
+        </tbody>    
+    </table>
+    <br>
+    <div id="aggregateHavingResultMsg"></div>
+    <!-- END OF AGGREGATION WITH HAVING======================================================================== -->
+
+
+
+
+    <br><hr><br> <!-- DIVISION ========================================================================= -->
+    <h2>Search for Users who has joined all Comminities</h2>
+    <button id="divisionShowBtn" onclick="divisionShowUser();">Show Users</button>
+    <div style="display: flex; gap: 10px;">
+        <button id="divisionHideBtn" style="display: none" onclick="HideDivisionTable();">Hide Table</button>
+        <button id="divisionRefreshBtn" style="display: none" onclick="divisionShowUser();">Refresh</button>
+    </div>
+    <br>
+    <table id="divisionTable" style="display: none">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Display Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- rows hre -->
+        </tbody>    
+    </table>
+    <div id="divisionResultMsg"></div>
+    <!-- END OF DIVISION ======================================================================== -->
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -270,5 +352,8 @@
     <script src="scripts.js"></script>
     <script src="update.js"></script>
     <script src="selection.js"></script>
+    <script src="aggregateHaving.js"></script>
+    <script src="division.js"></script>
+</body>
 </body>
 </html>

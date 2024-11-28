@@ -1,7 +1,26 @@
 let numClause = 0; 
-let clausesContainer= document.getElementById('clausesContainer');
+const clausesContainer= document.getElementById('clausesContainer');
+const selectionTable = document.getElementById('selectionTable');
+const selectionResultMsg = document.getElementById('selectionResultMsg');
+const selectionSearchBtn = document.getElementById('selectionSearchBtn');
+const clearClauseButton = document.getElementById('clearClauseButton');
+
+
+async function clearClause() {
+    const allClauses = document.querySelectorAll('.clause');
+    
+    allClauses.forEach(clause => {
+        clause.remove();
+    });
+    numClause=0;
+    selectionSearchBtn.style.display = 'none';
+    clearClauseButton.style.display='none';
+    selectionTable.style.display='none';
+    selectionResultMsg.style.display='none';
+}
 
 async function addClause() {
+    selectionSearchBtn.style.display='block';
     numClause++;
 
     // Create a div for the new clause
@@ -12,22 +31,19 @@ async function addClause() {
     if (numClause > 1) {
     const andOrDropdown = document.createElement('select');
     andOrDropdown.name = 'andOrDropdown';
-    andOrDropdown.innerHTML = `
-    <option value="AND"> AND </option>
-    <option value="OR"> OR </option>
-    `;
+    andOrDropdown.innerHTML = 
+    `<option value="AND"> AND </option>
+    <option value="OR"> OR </option>`;
     clauseDiv.appendChild(andOrDropdown);
-    }
+    } else
+        clearClauseButton.style.display='block';
 
 
-    // Attribute Dropdown
     const attributeDropdown = document.createElement('select');
     attributeDropdown.name = 'attribute';
-    attributeDropdown.innerHTML = `
-    <option value="awardName"> award name </option>
-    <option value="value"> value </option>
-
-    `;
+    attributeDropdown.innerHTML = 
+    `<option value="awardType"> award type </option>
+    <option value="value"> value </option>`;
     clauseDiv.appendChild(attributeDropdown);
 
     const equalSign = document.createElement('span');
@@ -41,7 +57,7 @@ async function addClause() {
     textInput.required = true;
 
     attributeDropdown.addEventListener('change', function() {
-        if (attributeDropdown.value === "awardName") {
+        if (attributeDropdown.value === "awardType") {
             textInput.type = 'text';
             textInput.placeholder = 'Enter award name';
         } else if (attributeDropdown.value == "value"){
@@ -86,10 +102,50 @@ async function searchAward(event) {
     });
 
     const responseData = await response.json();
-
+    console.log(responseData);
+    console.log(responseData.data);
+    console.log(responseData.data.rows);
+    selectionResultMsg.style.display='block';
     if (responseData.success) {
-        console.log("response success selection.js")
+        // console.log("response success selection.js")
+        selectionResultMsg.textContent= "";
+        showAwardTableForSelection(responseData);
     } else {
-        console.log("response fail selection.js")
+        // console.log("response fail selection.js")
+        selectionResultMsg.textContent= "Search fail!";
     }
+}
+
+async function showAwardTableForSelection(responseData) {
+    const tableBody = selectionTable.querySelector('tbody');
+
+    // clear old data
+    if (tableBody) {
+        tableBody.innerHTML = '';
+    }
+    
+
+    if( responseData.data.length == 0) {
+        selectionResultMsg.textContent= "No matching awards found!"
+        selectionTable.style.display='none';
+        return;
+    }
+
+    responseData.data.forEach(tuple => {
+        const row = tableBody.insertRow();
+
+        tuple.forEach((field, index) => {
+            const cell = row.insertCell(index);
+            cell.textContent = field;
+        });
+
+        
+    });
+
+    selectionResultMsg.textContent= "Search successful!";
+    selectionTable.style.display='block';
+    // divisionShowBtn.style.display='none';
+    // divisionHideBtn.style.display='block';
+    // divisionRefreshBtn.style.display='block';
+    
 }
