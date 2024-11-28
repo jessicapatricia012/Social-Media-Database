@@ -182,7 +182,7 @@
 
 
     <br><hr><br> <!-- UPDATE========================================================================= -->
-    <h2>Update Attributes of User</h2>
+    <h2>Update User's Info</h2>
     <button id = "updateShowBtn" onclick="displayTuplesForUpdate();">Show Users</button>
     <div style="display: flex; gap: 10px;">
         <button id="updateHideBtn" style="display: none" onclick="HideUpdateTable();">Hide Table</button>
@@ -220,17 +220,35 @@
 
 
     <br><hr><br> <!-- SELECTION========================================================================= -->
-    <h2>Selection: Search Award</h2>
+    <h2>Search Award</h2>
     <p>clauses will be read from top to bottom (first AND/OR second) AND/OR third ...) </p>
 
     <form id="selectionForm" onsubmit="searchAward(event)">
         <div id="clausesContainer">
             <!-- Conditions will be dynamically added here -->
         </div>
-        <button type="button" id="addClauseButton" onclick="addClause();" >Add Clause</button> 
+        <div style="display: flex; gap: 10px;">
+            <button type="button" id="addClauseButton" onclick="addClause();" >Add Clause</button>
+            <button type="button" id="clearClauseButton" onclick="clearClause();" style="display: none;">Clear</button> 
+        </div>
         <br><br>
-        <button type="submit">Search</button>
+        <button id='selectionSearchBtn' type="submit" style="display: none;">Search</button>
+
+
     </form>
+    <table id="selectionTable" style="display: none">
+        <thead>
+            <tr>
+                <th>Award Type</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- rows hre -->
+        </tbody>    
+    </table>
+    <br>
+    <div id="selectionResultMsg"></div>
      <!-- END OF SELECTION======================================================================== -->
 
 

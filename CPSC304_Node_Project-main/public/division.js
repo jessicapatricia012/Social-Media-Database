@@ -33,6 +33,7 @@ async function displayTuplesForDivision(responseData) {
     if (tableBody) {
         tableBody.innerHTML = '';
     }
+    console.log(responseData);
     console.log(responseData.data);
 
     if( responseData.data.length == 0) {

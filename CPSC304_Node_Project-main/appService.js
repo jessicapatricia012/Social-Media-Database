@@ -239,6 +239,7 @@ async function updateUser(username, email, displayName, dateJoined) {
             [email, displayName, dateJoined, username],
             { autoCommit: true }
         );
+        // console.log(typeof(email));
         return result.rowsAffected && result.rowsAffected > 0;
         });
     } catch (error) {
@@ -252,10 +253,10 @@ async function updateUser(username, email, displayName, dateJoined) {
 
 
 async function selectAward(clauses) {
-    console.log('search appservice'); //not called
+    console.log('search appservice'); 
     return await withOracleDB(async (connection) => {
-        console.log('search appservice'); //not called
-        let sqlQuery = 'SELECT * FROM AWARDS WHERE ';
+        console.log(clauses); 
+        let sqlQuery = 'SELECT * FROM AWARD WHERE ';
         const queryParams = {};
         
         let count = 0;
@@ -263,17 +264,22 @@ async function selectAward(clauses) {
             if (count > 0) 
                 sqlQuery += ` ${clause.operator} `; //AND/OR added betwwen clauses
 
-            const a = `:${clause.attribute}_${index}`;
-            sqlQuery += `${clause.attribute} = ${a}`;
+            const a = `${clause.attribute}_${index}`;
+            sqlQuery += `UPPER(${clause.attribute}) = UPPER(:${a})`;
             queryParams[a] = clause.value;
             count++;
         });
-            
+        console.log(sqlQuery);   
+        // console.log(typeof(queryParams[0]));   
+        console.log(queryParams);  
+        // console.log(sqlQuery);   
         const result = await connection.execute(
             sqlQuery,
             queryParams,
             { autoCommit: true }
         );
+        console.log(result);
+        console.log(result.rows);
         return result.rows;
     }).catch(() => {
         return false;
@@ -289,7 +295,7 @@ async function aggregateHaving() {
             GROUP BY username 
             HAVING COUNT(awardType) >= 5`,
             [],
-            { autoCommit: true }
+            { autoCommit: true }        
         );
         return result.rows;
     }).catch(() => {

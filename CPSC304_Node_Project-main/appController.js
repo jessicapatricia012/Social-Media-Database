@@ -128,13 +128,16 @@ router.post("/update-user", async (req, res) => {
 });
 
 router.post("/select-award", async (req, res) => {
-    console.log('search router');//not called
+    console.log('search router');
     const clauses = req.body.clauses;
-    console.log('a', clauses);
+    console.log('router', clauses);
     
     const searchResult = await appService.selectAward(clauses);
     if (searchResult) {
-        res.json({ success: true });
+        if (searchResult.length>0)
+            res.json({ success: true, data: searchResult });
+        else
+            res.json({ success: true, data: [] });
     } else {
         res.status(500).json({ success: false });
     }
@@ -142,7 +145,7 @@ router.post("/select-award", async (req, res) => {
 });
 
 router.post("/aggregate-having", async (req, res) => {
-    console.log('a-having router');   //not called
+    console.log('a-having router');  
     const searchResult = await appService.aggregateHaving();
     if (searchResult) {
         if (searchResult.length>0)
@@ -156,7 +159,7 @@ router.post("/aggregate-having", async (req, res) => {
 });
 
 router.post("/division", async (req, res) => {
-    console.log('division router');   //not called
+    console.log('division router');  
     const searchResult = await appService.division();
     if (searchResult) {
         if (searchResult.length>0)

@@ -16,7 +16,7 @@ async function updateUser(event) {
     const updateDateJoined = document.getElementById('updateDateJoined').value;
 
     try {
-        const response = await fetch("/update-user", {  //error
+        const response = await fetch("/update-user", { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
