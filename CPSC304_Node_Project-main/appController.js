@@ -133,6 +133,11 @@ router.post("/delete-user", async(req,res) =>{
         }
 });
 
+router.get("/num-post", async(req, res) =>{
+        const numPostresult = await appService.fetchNumPostUser(); 
+        res.json({ data: numPostresult});
+});
+
 
 router.post("/insert-demotable", async (req, res) => {
     const { id, name } = req.body;

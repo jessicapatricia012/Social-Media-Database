@@ -149,10 +149,10 @@
     <h2>Delete Account</h2>
     <div class = "deleteUserHeader" >
     <p>Select an Account to Delete</p>
-    <button id = "selectAccount">Hide Table</button>
+    <button id = "selectAccount">Show Table</button>
     </div>
 
-    <table id = "deleteUserTable"> 
+    <table id = "deleteUserTable" class = "hide-table"> 
         <thead>
             <tr>
                 <th>Username</th>
@@ -166,6 +166,30 @@
     </table>
     <button id = "deleteButton">Delete</button>
     <div id="deleteUserMsg"></div>
+
+    <br><hr><br> <!-- ========================== NUMBER OF POSTS BY USER =============================================== -->
+
+    <h2>See Number of Posts By User</h2>
+    <div class = "numPostHeader">
+        <button id = "showNumPost">Show Table</button>
+        <button id="refresh">Refresh</button>
+    </div>
+
+    <table id="numPostTable" class = "hide-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Number of Post</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Some User</td>
+                <td>Some num</td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="refreshMsg"></div>
 
 
     <br><hr><br> <!-- ========================================================================= -->
@@ -241,7 +265,8 @@
 
     <!-- ===================================================================================== -->
     <!-- External JavaScript file that contains the functionality/logic for the operations above. -->
-     <script src = "delete.js"></script>
+     <script src = "numpost.js"></script>
+    <script src = "delete.js"></script>
     <script src="scripts.js"></script>
     <script src="update.js"></script>
     <script src="selection.js"></script>

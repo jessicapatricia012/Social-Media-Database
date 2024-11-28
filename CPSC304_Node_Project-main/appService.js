@@ -233,6 +233,21 @@ async function deleteUser(username){
     });
 }
 
+async function fetchNumPostUser(){
+      return await withOracleDB(async (connection) => {
+        const result = await connection.execute(`SELECT u.username, count(*) 
+                                                 FROM USERS u, ENTRYCREATEDBY e, POSTIN p 
+                                                 WHERE e.username = u.username and e.entryid = p.entryid
+                                                 GROUP BY u.username`);
+        console.log("NUMPOSTUSER: Fetch Succesful!");
+        console.log(result.rows);
+        return result.rows;
+    }).catch(() => {
+        console.log("NUMPOSTUSER: Fetch failed!");
+        return [];
+    });
+}
+
 async function updateUser(username, email, displayName, dateJoined) {
     console.log("a");
     try {
@@ -371,5 +386,6 @@ module.exports = {
     insertUser,
     selectAward,
     insertPost,
-    deleteUser
+    deleteUser,
+    fetchNumPostUser
 };
