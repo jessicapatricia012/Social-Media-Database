@@ -26,7 +26,7 @@ CREATE TABLE Users (
 
 CREATE TABLE UsersAge(
 	dateJoined DATE	PRIMARY KEY,
-	age INTEGER	NOT NULL
+	age INTEGER
 );
 
 CREATE TABLE Communities (
@@ -122,6 +122,9 @@ CREATE TABLE JoinsCommunity(
  
 CREATE TABLE ImageContainedBy(
 	AttachmentID	INTEGER 	PRIMARY KEY,
+	width INTEGER,
+	height INTEGER,
+	imgSize FLOAT,
 	imageFile	LONG RAW	NOT NULL,
 	entryID	INTEGER,
 	messageID	INTEGER,
@@ -131,6 +134,10 @@ CREATE TABLE ImageContainedBy(
 
 CREATE TABLE VideoContainedBy(
 	attachmentID	INTEGER 	PRIMARY KEY,
+	width INTEGER,
+	height INTEGER,
+	vidSize FLOAT,
+	duration INTERVAL DAY TO SECOND,
 	videoFile	LONG RAW	NOT NULL,
 	entryID	INTEGER,
 	messageID	INTEGER,
