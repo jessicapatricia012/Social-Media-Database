@@ -1,4 +1,6 @@
+//This js file contains code for the Delete User feature
 
+//Get HTML elements and register event listeners
 const selectButton = document.getElementById('selectAccount');
 const deleteButton = document.getElementById('deleteButton');
 selectButton.addEventListener('click',toggleTable);
@@ -30,6 +32,7 @@ async function displayUsers(){
     });
 }
 
+//Selects user on click of a row
 function selectRow(event){
     const table = document.getElementById('deleteUserTable');
     table.querySelectorAll('td').forEach(cell => {cell.classList.remove('selectedDelete')});
@@ -39,6 +42,7 @@ function selectRow(event){
     selectedRow.classList.add('selectedDelete');
 }
 
+//Delete selected row on click of delete button
 async function deleteSelected(){
     const deleteUserTable = document.getElementById("deleteUserTable");
     const cells = deleteUserTable.querySelectorAll("td");
@@ -74,6 +78,7 @@ async function deleteSelected(){
     }
 }
 
+//Toggles table on click of show/hide table
 function toggleTable(){
     const deleteUserTable = document.getElementById("deleteUserTable");
     const showTableButton = document.getElementById("selectAccount");
@@ -86,4 +91,4 @@ function toggleTable(){
     }
 }
 
-displayUsers();
+displayUsers();//Displays once onload

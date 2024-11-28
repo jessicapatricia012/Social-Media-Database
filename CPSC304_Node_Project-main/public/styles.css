@@ -172,7 +172,14 @@ button#deleteButton{
     display:none;
 }
 
+/* See NumPost */
+.numPostHeader button {
+    margin-bottom: 15px;
+}
+
+
 /* Update User */
 button.showTup{
     margin-bottom: 15px;
 }
+

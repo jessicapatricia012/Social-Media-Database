@@ -110,6 +110,21 @@ router.post("/delete-user", async(req,res) =>{
         }
 });
 
+router.get("/num-post", async(req, res) =>{
+        const numPostresult = await appService.fetchNumPostUser(); 
+        res.json({ data: numPostresult});
+});
+
+router.post("/insert-demotable", async (req, res) => {
+    const { id, name } = req.body;
+    const insertResult = await appService.insertDemotable(id, name);
+    if (insertResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+});
+
 router.post("/update-user", async (req, res) => {
     console.log('update router');
     const { username, email, displayName, dateJoined } = req.body;
