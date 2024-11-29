@@ -3,9 +3,11 @@
 //Get HTML elements and register event listeners
 const selectButton = document.getElementById('selectAccount');
 const deleteButton = document.getElementById('deleteButton');
+const refreshAccountButton = document.getElementById("refreshAccount");
+
 selectButton.addEventListener('click',toggleTable);
 deleteButton.addEventListener('click',deleteSelected);
-
+refreshAccountButton.addEventListener("click", displayUsers);
 
 //Display Users from Database
 async function displayUsers(){
