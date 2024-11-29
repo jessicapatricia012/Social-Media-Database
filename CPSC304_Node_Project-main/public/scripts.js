@@ -548,7 +548,7 @@ async function insertUser(event){
         messageElement.textContent = "Account Created successfully!";
         fetchTableData();
     } else {
-        messageElement.textContent = "Error Creating Account!";
+        messageElement.textContent = "Error Creating Account! Username or email taken";
     }
 }
 
@@ -583,8 +583,8 @@ async function insertPost(event){
         messageElement.textContent = "Posted!";
         fetchTableData();
     } else {
-        messageElement.textContent = "Error Posting!";
-    }
+        messageElement.textContent = "Error Posting! Make sure username or community exists";
+    } 
 }
 
 

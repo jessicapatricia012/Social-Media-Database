@@ -149,7 +149,17 @@ dropdownButton:hover {
     margin-bottom: 0.7em;
 }
 
-/* Inser */
+/* Create Account */
+#insertUser input{
+    display: block;
+}
+
+
+/* Create Post */
+#user,#title, #community, #content{
+    display: block;
+    width: 100%;
+}
 
 /* Delete User */
 div.deleteUserHeader {
