@@ -68,16 +68,16 @@ CREATE TABLE MessageSentByIn (
 	content	LONG	NOT NULL,
 	username	VARCHAR(50)	NOT NULL,
 	chatroomID	INTEGER	NOT NULL,
-	FOREIGN KEY (chatroomID) REFERENCES Chatroom(chatroomID),
-	FOREIGN KEY (username) REFERENCES Users(username)	
+	FOREIGN KEY (chatroomID) REFERENCES Chatroom(chatroomID) ON DELETE CASCADE,
+	FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE	
 );
 
 CREATE TABLE JoinsChatroom (
 	chatroomID	INTEGER,
 	username	VARCHAR(50),
 	PRIMARY KEY (chatroomID, username),
-	FOREIGN KEY (chatroomID) REFERENCES Chatroom(chatroomID),
-	FOREIGN KEY (username) REFERENCES Users(username)
+	FOREIGN KEY (chatroomID) REFERENCES Chatroom(chatroomID) ON DELETE CASCADE,
+	FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE
 );
 
 CREATE TABLE Award (
@@ -90,17 +90,17 @@ CREATE TABLE GivenToBy (
 	username	VARCHAR(50),
 	entryID	INTEGER,
 	PRIMARY KEY (awardType, username, entryID),
-	FOREIGN KEY (awardType) REFERENCES Award(awardType),
-	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy(entryID),
-	FOREIGN KEY (username) REFERENCES Users(username)
+	FOREIGN KEY (awardType) REFERENCES Award(awardType) ON DELETE CASCADE,
+	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy(entryID) ON DELETE CASCADE,
+	FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE
 );
 
 CREATE TABLE Follows(
 	followingUsername	VARCHAR(50),
 	followedUsername 	VARCHAR(50),
 	PRIMARY KEY (followingUsername, followedUsername),
-	FOREIGN KEY (followingUsername) REFERENCES Users(username),
-	FOREIGN KEY (followedUsername) REFERENCES Users(username)
+	FOREIGN KEY (followingUsername) REFERENCES Users(username) ON DELETE CASCADE,
+	FOREIGN KEY (followedUsername) REFERENCES Users(username) ON DELETE CASCADE
 );
 
 CREATE TABLE Vote (
@@ -108,8 +108,8 @@ CREATE TABLE Vote (
 	entryID	INTEGER,
 	upvoteOrDownvote	INTEGER,
 	PRIMARY KEY(username, entryID),
-	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy(entryID),
-	FOREIGN KEY (username) REFERENCES Users(username)
+	FOREIGN KEY (entryID) REFERENCES EntryCreatedBy(entryID) ON DELETE CASCADE,
+	FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE
 );
 
 CREATE TABLE JoinsCommunity(
@@ -128,8 +128,8 @@ CREATE TABLE ImageContainedBy(
 	imageFile	LONG RAW	NOT NULL,
 	entryID	INTEGER,
 	messageID	INTEGER,
-	FOREIGN KEY (entryID) REFERENCES PostIn(entryID),
-	FOREIGN KEY (messageID) REFERENCES MessageSentByIn(messageID)
+	FOREIGN KEY (entryID) REFERENCES PostIn(entryID) ON DELETE CASCADE,
+	FOREIGN KEY (messageID) REFERENCES MessageSentByIn(messageID) ON DELETE CASCADE
 );
 
 CREATE TABLE VideoContainedBy(
@@ -141,6 +141,6 @@ CREATE TABLE VideoContainedBy(
 	videoFile	LONG RAW	NOT NULL,
 	entryID	INTEGER,
 	messageID	INTEGER,
-	FOREIGN KEY (entryID) REFERENCES PostIn(entryID),
-	FOREIGN KEY (messageID) REFERENCES MessageSentByIn(messageID)
+	FOREIGN KEY (entryID) REFERENCES PostIn(entryID) ON DELETE CASCADE,
+	FOREIGN KEY (messageID) REFERENCES MessageSentByIn(messageID) ON DELETE CASCADE
 );
