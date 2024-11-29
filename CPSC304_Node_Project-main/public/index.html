@@ -49,77 +49,7 @@
 
     </div>
 
-    <br><hr><br> <!-- Projection ========================================================================= -->
 
-    <h1>Projection</h1>
-    <h2> Choose tables to project </h2>
-    <p>Order the features you want to display</p>
-    <div class="projectDropdown">
-        <button id="projectDropdownButton">Select Tables</button>
-        <ul id="projectDropdownMenu" class="dropdown-menu">
-            <!-- Options will be dynamically populated -->
-        </ul>
-        <button id="selectButton">Refresh</button>
-    </div>
-
-    <h3><span id="projectSelectedOptions"></span></h3>
-    <form id= "projectRow">
-        <!-- Form will be dynamically created-->
-    </form>
-    <div id="projectionTablesContainer">
-        <table id="projectionTables">
-            <thead></thead>
-            <tbody></tbody>
-        </table>
-
-    </div>
-
-    <br><hr><br> <!-- Join ========================================================================= -->
-
-    <h2> Look at Entries created by a user</h2>
-    <form id="joinForm">
-        <h3>Select Attributes to Include:</h3>
-        <!--User check boxes-->
-        <fieldset>
-            <legend>Users Table</legend>
-            <input type="checkbox" id="joinUsername" name="attributes" value="Users.username">
-            <label for="joinUsername">Username</label><br>
-            <input type="checkbox" id="joinEmail" name="attributes" value="Users.email">
-            <label for="joinEmail">Email</label><br>
-            <input type="checkbox" id="joinDisplayName" name="attributes" value="Users.displayName">
-            <label for="joinDisplayName">Display Name</label><br>
-            <input type="checkbox" id="joinDateJoined" name="attributes" value="Users.dateJoined">
-            <label for="joinDateJoined">Date Joined</label><br>
-        </fieldset>
-        <!--Entry check boxes-->
-        <fieldset>
-            <legend>EntryCreatedBy Table</legend>
-            <input type="checkbox" id="JoinEntryID" name="attributes" value="EntryCreatedBy.entryID">
-            <label for="joinEntryID">Entry ID</label><br>
-            <input type="checkbox" id="joinDateCreated" name="attributes" value="EntryCreatedBy.dateCreated">
-            <label for="joinDateCreated">Date Created</label><br>
-            <input type="checkbox" id="joinContent" name="attributes" value="EntryCreatedBy.content">
-            <label for="joinContent">Content</label><br>
-        </fieldset>
-        <p>Write down which user you would like to preview</p>
-        <input type="text" id="usernameInput" placeholder="Enter username">
-
-        <!-- button to call join-->
-        <button id= "joinButton">Submit</button>
-    </form>
-    <div id="joinResult"></div>
-    <!--table to show result-->
-    <div id="joinTablesContainer">
-        <table id="joinTables">
-            <thead></thead>
-            <tbody></tbody>
-        </table>
-
-    </div>
-
-
-
-    <br><hr><br> <!-- ========================================================================= -->
 
     <h2>Reset Database</h2>
     <p>Click 'Reset' to reset the database.</p>
@@ -141,9 +71,10 @@
         <div id = "insertUserMsg"></div>
     </form>
 
-    <br><hr><br> <!-- ========================================================================= -->
-
+    <br><hr><br> <!-- 2.1.1 INSERT======================================================================= -->
+    <h1>2.1.1 Insert</h1>
     <h2>Create Post</h2>
+
     <form id ="insertPost">
         <label for="user">Username</label>
         <input type="text" id = "user">
@@ -155,79 +86,14 @@
         <button type = "submit">Post</button>
         <div id="insertPostMsg"></div>
     </form>
+     <!-- END OF INSERT======================================================================== -->
 
-    <br><hr><br> <!-- ========================== DELETE USER =============================================== -->
-
-    <h2>Delete Account</h2>
-    <div class = "deleteUserHeader" >
-    <p>Select an Account to Delete</p>
-    <button id = "selectAccount">Show Table</button>
-    </div>
-
-    <table id = "deleteUserTable" class = "hide-table"> 
-        <thead>
-            <tr>
-                <th>Username</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td class = "selectedDelete">Some User</td>
-            </tr>
-        </tbody>
-    </table>
-    <button id = "deleteButton">Delete</button>
-    <div id="deleteUserMsg"></div>
-
-    <br><hr><br> <!-- ========================== NUMBER OF POSTS BY USER =============================================== -->
-
-    <h2>See Number of Posts By User</h2>
-    <div class = "numPostHeader">
-        <button id = "showNumPost">Show Table</button>
-        <button id="refresh">Refresh</button>
-    </div>
-
-    <table id="numPostTable" class = "hide-table">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>Number of Post</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Some User</td>
-                <td>Some num</td>
-            </tr>
-        </tbody>
-    </table>
-    <div id="refreshMsg"></div>
-
-    <br><hr><br> <!-- ========================== Most Popular Communities =============================================== -->
     
-    <h2>Most Popular Communities</h2>
-    <div class="MostPopHeader">
-        <button id="mostPopRefresh">Refresh</button>
-    </div>
-    <table id="mostPopTable">
-        <thead>
-            <tr>
-                <th>Community</th>
-                <th>Members</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Some Community</td>
-                <td>12</td>
-            </tr>
-        </tbody>
-    </table>
-    <div id="mostPopRfsMsg"></div>
 
-    <br><hr><br> <!-- ========================== Most Popular Communities =============================================== -->
-    
-    <br><hr><br> <!-- UPDATE========================================================================= -->
+
+
+    <br><hr><br> <!-- 2.1.2 UPDATE========================================================================= -->
+    <h1>2.1.2 Update</h1>
     <h2>Update User's Info</h2>
     <button id = "updateShowBtn" onclick="displayTuplesForUpdate();">Show Users</button>
     <div style="display: flex; gap: 10px;">
@@ -247,13 +113,12 @@
         <tbody>
         </tbody>    
     </table>
-
     <div>
         <h4 id="selectARowMsg" style="display: none;"> Select a row </h4> 
     </div>
     <form id="updateForm" style="display: none;" onsubmit="updateUser(event)">
         Username: <input type="text" id="updateUsername" readonly> <br>
-        Email (this has to be unique): <input type="text" id="updateEmail" maxlength="50"> <br>
+        Email (this has to be unique): <input type="email" id="updateEmail" maxlength="50"> <br>
         DisplayName: <input type="text" id="updateDisplayName" required> <br>
         Date Joined: <input type="date" id="updateDateJoined" readonly> <br>
         <button type="submit" > update </button> <br>
@@ -265,10 +130,38 @@
 
 
 
-    <br><hr><br> <!-- SELECTION========================================================================= -->
-    <h2>Search Award</h2>
-    <p>clauses will be read from top to bottom (first AND/OR second) AND/OR third ...) </p>
+     <br><hr><br> <!-- 2.1.3 DELETE ===================================================== -->
+     <h1>2.1.3 Delete</h1>
+     <h2>Delete Account</h2>
+     <div class = "deleteUserHeader" >
+     <p>Select an Account to Delete</p>
+     <button id = "selectAccount">Show Table</button>
+     </div>
+ 
+     <table id = "deleteUserTable" class = "hide-table"> 
+         <thead>
+             <tr>
+                 <th>Username</th>
+             </tr>
+         </thead>
+         <tbody>
+             <tr>
+                 <td class = "selectedDelete">Some User</td>
+             </tr>
+         </tbody>
+     </table>
+     <button id = "deleteButton">Delete</button>
+     <div id="deleteUserMsg"></div>
+     <!-- END OF DELETE ======================================================================== -->
 
+
+
+
+
+    <br><hr><br> <!-- 2.1.4 SELECTION========================================================================= -->
+    <h1>2.1.4 Selection</h1>
+    <h2>Search Award</h2>
+    <p>clauses will be read from top to bottom (first_clause AND/OR second_clause) AND/OR third_clause ... </p>
     <form id="selectionForm" onsubmit="searchAward(event)">
         <div id="clausesContainer">
             <!-- Conditions will be dynamically added here -->
@@ -279,8 +172,6 @@
         </div>
         <br><br>
         <button id='selectionSearchBtn' type="submit" style="display: none;">Search</button>
-
-
     </form>
     <table id="selectionTable" style="display: none">
         <thead>
@@ -301,7 +192,113 @@
 
 
 
-    <br><hr><br> <!-- AGGREGATION WITH HAVING========================================================================= -->
+     <br><hr><br> <!-- 2.1.5 PROJECTION ========================================================================= -->
+     <h1>2.1.5 Projection</h1>
+     <h2> Choose tables to project </h2>
+     <p>Order the features you want to display</p>
+     <div class="projectDropdown">
+         <button id="projectDropdownButton">Select Tables</button>
+         <ul id="projectDropdownMenu" class="dropdown-menu">
+             <!-- Options will be dynamically populated -->
+         </ul>
+         <button id="selectButton">Refresh</button>
+     </div>
+ 
+     <h3><span id="projectSelectedOptions"></span></h3>
+     <form id= "projectRow">
+         <!-- Form will be dynamically created-->
+     </form>
+     <div id="projectionTablesContainer">
+         <table id="projectionTables">
+             <thead></thead>
+             <tbody></tbody>
+         </table>
+     </div>
+     <!-- END OF PROJECTION========================================================================= -->
+
+
+
+
+ 
+     <br><hr><br> <!-- 2.1.6 JOIN ========================================================================= -->
+     <h1>2.1.6 Join</h1>
+     <h2> Look at Entries created by a user</h2>
+     <form id="joinForm">
+         <h3>Select Attributes to Include:</h3>
+         <!--User check boxes-->
+         <fieldset>
+             <legend>Users Table</legend>
+             <input type="checkbox" id="joinUsername" name="attributes" value="Users.username">
+             <label for="joinUsername">Username</label><br>
+             <input type="checkbox" id="joinEmail" name="attributes" value="Users.email">
+             <label for="joinEmail">Email</label><br>
+             <input type="checkbox" id="joinDisplayName" name="attributes" value="Users.displayName">
+             <label for="joinDisplayName">Display Name</label><br>
+             <input type="checkbox" id="joinDateJoined" name="attributes" value="Users.dateJoined">
+             <label for="joinDateJoined">Date Joined</label><br>
+         </fieldset>
+         <!--Entry check boxes-->
+         <fieldset>
+             <legend>EntryCreatedBy Table</legend>
+             <input type="checkbox" id="JoinEntryID" name="attributes" value="EntryCreatedBy.entryID">
+             <label for="joinEntryID">Entry ID</label><br>
+             <input type="checkbox" id="joinDateCreated" name="attributes" value="EntryCreatedBy.dateCreated">
+             <label for="joinDateCreated">Date Created</label><br>
+             <input type="checkbox" id="joinContent" name="attributes" value="EntryCreatedBy.content">
+             <label for="joinContent">Content</label><br>
+         </fieldset>
+         <p>Write down which user you would like to preview</p>
+         <input type="text" id="usernameInput" placeholder="Enter username">
+ 
+         <!-- button to call join-->
+         <button id= "joinButton">Submit</button>
+     </form>
+     <div id="joinResult"></div>
+     <!--table to show result-->
+     <div id="joinTablesContainer">
+         <table id="joinTables">
+             <thead></thead>
+             <tbody></tbody>
+         </table>
+ 
+     </div>
+     <!-- END OF JOIN========================================================================= -->
+
+
+
+
+
+     <br><hr><br> <!-- 2.1.7 AGGREGATION WITH GROUP BY =============================================== -->
+     <h1>2.1.7 Aggregation with Group By</h1>
+     <h2>See Number of Posts By User</h2>
+     <div class = "numPostHeader">
+         <button id = "showNumPost">Show Table</button>
+         <button id="refresh">Refresh</button>
+     </div>
+ 
+     <table id="numPostTable" class = "hide-table">
+         <thead>
+             <tr>
+                 <th>Username</th>
+                 <th>Number of Post</th>
+             </tr>
+         </thead>
+         <tbody>
+             <tr>
+                 <td>Some User</td>
+                 <td>Some num</td>
+             </tr>
+         </tbody>
+     </table>
+     <div id="refreshMsg"></div>
+     <!-- END OF AGGREGATION WITH GROUP BY======================================================================== -->
+
+
+
+
+
+    <br><hr><br> <!-- 2.1.8 AGGREGATION WITH HAVING========================================================================= -->
+    <h1>2.1.8 Aggregation with Having</h1>
     <h2>Search for Users who has given at least 5 awards</h2>
     <button id="aHShowTableBtn" onclick="generateAgregateHavingTable();">Show Table</button>
     <div style="display: flex; gap: 10px;">
@@ -327,7 +324,37 @@
 
 
 
-    <br><hr><br> <!-- DIVISION ========================================================================= -->
+
+    <br><hr><br> <!-- 2.1.9 NESTED AGGREGATION WITH GROUP BY =============================================== -->
+    <h1>2.1.9 Nested Aggregation with Group By</h1>
+    <h2>Most Popular Communities</h2>
+    <div class="MostPopHeader">
+        <button id="mostPopRefresh">Refresh</button>
+    </div>
+    <table id="mostPopTable">
+        <thead>
+            <tr>
+                <th>Community</th>
+                <th>Members</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Some Community</td>
+                <td>12</td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="mostPopRfsMsg"></div>
+
+     <!-- END OF NESTED AGGREGATION WITH GROUP BY =============================================== -->
+
+
+
+
+
+    <br><hr><br> <!-- 2.1.10 DIVISION ========================================================================= -->
+    <h1>2.1.10 Division</h1>
     <h2>Search for Users who has joined all Comminities</h2>
     <button id="divisionShowBtn" onclick="divisionShowUser();">Show Users</button>
     <div style="display: flex; gap: 10px;">
@@ -357,15 +384,6 @@
 
 
 
-
-
-
-
-
-    <!-- <h2>Count the Tuples in DemoTable</h2>
-    <button id="countDemotable"> count </button> <br><br> -->
-    <!-- A placeholder to display the count result. -->
-    <!-- <div id="countResultMsg"></div> <br> -->
 
     <!-- ===================================================================================== -->
     <!-- External JavaScript file that contains the functionality/logic for the operations above. -->
