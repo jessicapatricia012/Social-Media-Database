@@ -203,8 +203,30 @@
     </table>
     <div id="refreshMsg"></div>
 
+    <br><hr><br> <!-- ========================== Most Popular Communities =============================================== -->
+    
+    <h2>Most Popular Communities</h2>
+    <div class="MostPopHeader">
+        <button id="mostPopRefresh">Refresh</button>
+    </div>
+    <table id="mostPopTable">
+        <thead>
+            <tr>
+                <th>Community</th>
+                <th>Members</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Some Community</td>
+                <td>12</td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="mostPopRfsMsg"></div>
 
-
+    <br><hr><br> <!-- ========================== Most Popular Communities =============================================== -->
+    
     <br><hr><br> <!-- UPDATE========================================================================= -->
     <h2>Update User's Info</h2>
     <button id = "updateShowBtn" onclick="displayTuplesForUpdate();">Show Users</button>
@@ -347,7 +369,8 @@
 
     <!-- ===================================================================================== -->
     <!-- External JavaScript file that contains the functionality/logic for the operations above. -->
-     <script src = "numpost.js"></script>
+    <script src = "nested.js"></script>
+    <script src = "numpost.js"></script>
     <script src = "delete.js"></script>
     <script src="scripts.js"></script>
     <script src="update.js"></script>

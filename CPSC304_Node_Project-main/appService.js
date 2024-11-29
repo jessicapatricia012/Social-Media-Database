@@ -240,6 +240,23 @@ async function fetchNumPostUser(){
     });
 }
 
+async function fetchMostPop(){
+    return await withOracleDB(async (connection) =>{
+        const result = await connection.execute(`select communityname, count(*)
+                                                from joinscommunity
+                                                group by communityname
+                                                having count (*) >= all(select count(*)
+                                                from joinscommunity
+                                                group by communityname)`);
+        console.log("MOSTPOPCOM: Fetch Succesful");
+        console.log(result.rows);
+        return result.rows;
+    }).catch(() =>{
+        console.log("MOSTPOPCOM: Fetch failed!");
+        return[];
+    });
+}
+
 async function updateUser(username, email, displayName, dateJoined) {
     console.log("a");
     try {
@@ -385,5 +402,6 @@ module.exports = {
     fetchNumPostUser,
     aggregateHaving,
     deleteUser,
-    division
+    division,
+    fetchMostPop
 };
