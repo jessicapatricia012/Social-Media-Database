@@ -187,6 +187,11 @@ button#deleteButton{
     margin-bottom: 15px;
 }
 
+/* Most Popular Community */
+#mostPopRefresh{
+    margin-bottom: 15px;
+}
+
 
 /* Update User */
 button.showTup{

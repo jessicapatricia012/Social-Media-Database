@@ -115,6 +115,11 @@ router.get("/num-post", async(req, res) =>{
         res.json({ data: numPostresult});
 });
 
+router.get("/most-pop", async(req, res) => {
+        const mostPopResult = await appService.fetchMostPop();
+        res.json({data:mostPopResult});
+})
+
 router.post("/insert-demotable", async (req, res) => {
     const { id, name } = req.body;
     const insertResult = await appService.insertDemotable(id, name);
