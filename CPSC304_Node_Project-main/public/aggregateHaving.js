@@ -54,6 +54,7 @@ async function displayTuplesForAggregateHaving(responseData) {
         
     });
 
+    aggregateHavingResultMsg.textContent= "Search successful!";
     aggregateHavingTable.style.display='block';
     aHShowTableBtn.style.display='none';
     aHHideTableBtn.style.display='block';
@@ -66,5 +67,7 @@ async function HideAgregateHavingTable() {
     aHShowTableBtn.style.display='block';
     aHRefreshTableBtn.style.display='none';
     aHHideTableBtn.style.display='none';
+    aggregateHavingResultMsg.textContent= "";
+
 }
 

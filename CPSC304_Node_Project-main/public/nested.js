@@ -3,6 +3,8 @@
 //Grab HTML elements
 const refreshPopButton = document.getElementById("mostPopRefresh");
 const mostPopTable = document.getElementById("mostPopTable");
+const mostPopRfsMsg = document.getElementById("mostPopRfsMsg");
+
 
 //Register eveny listeners
 refreshPopButton.addEventListener("click",displayCommunity);
@@ -32,6 +34,7 @@ async function displayCommunity(){
             cell.textContent = field;
         })
     });
+    mostPopRfsMsg.textContent="Table refereshed!"
 }
 
 displayCommunity(); //call once onload

@@ -459,7 +459,7 @@ function generateForm(option, tableName, sqlCommand) {
 }
 
 
-
+const joinResultMsg=document.getElementById('joinResultMsg');
 // Makes a query for join and sends it to oracle
 async function performJoin() {
     clearTable("joinTablesContainer");
@@ -478,6 +478,8 @@ async function performJoin() {
         const { data } = await response.json();
 
         createTable(metadata, data,"Entries and User Combined Table",'joinTablesContainer');
+        if (metadata.length > 0)
+            joinResultMsg.textContent='Join performed!';
     } catch (err) {
         console.error('Error fetching data:', err);
     }

@@ -51,6 +51,7 @@ async function displayTuplesForDivision(responseData) {
 
         
     });
+    divisionResultMsg.textContent= "Search successful!"
 
     divisionTable.style.display='block';
     divisionShowBtn.style.display='none';
@@ -64,4 +65,6 @@ async function HideDivisionTable() {
     divisionShowBtn.style.display='block';
     divisionRefreshBtn.style.display='none';
     divisionHideBtn.style.display='none';
+    divisionResultMsg.textContent= "";
+
 }

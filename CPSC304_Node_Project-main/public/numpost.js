@@ -4,6 +4,7 @@
 const showTableButton = document.getElementById('showNumPost');
 const refreshButton = document.getElementById("refresh");
 const numPostTable = document.getElementById("numPostTable");
+const refreshMsg = document.getElementById('refreshMsg');
 
 showTableButton.addEventListener('click', toggleTable);
 refreshButton.addEventListener("click",displayNumPost);
@@ -15,6 +16,7 @@ function toggleTable(){
     
     if (numPostTable.classList.contains("hide-table")){
         showTableButton.textContent = "Show Table";
+        
     } else{
         showTableButton.textContent = "Hide Table";
     }
@@ -45,6 +47,7 @@ async function displayNumPost(){
             cell.textContent = field;
         })
     });
+    refreshMsg.textContent="Search successful!";
 }
 
 displayNumPost(); //Displays once onload
