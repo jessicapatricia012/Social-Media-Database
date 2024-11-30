@@ -7,7 +7,12 @@ const mostPopRfsMsg = document.getElementById("mostPopRfsMsg");
 
 
 //Register eveny listeners
-refreshPopButton.addEventListener("click",displayCommunity);
+refreshPopButton.addEventListener("click",nestedRefresh);
+
+async function nestedRefresh() {
+    displayCommunity();
+    mostPopRfsMsg.textContent="Table refereshed!"
+}
 
 
 async function displayCommunity(){
@@ -34,7 +39,6 @@ async function displayCommunity(){
             cell.textContent = field;
         })
     });
-    mostPopRfsMsg.textContent="Table refereshed!"
 }
 
 displayCommunity(); //call once onload

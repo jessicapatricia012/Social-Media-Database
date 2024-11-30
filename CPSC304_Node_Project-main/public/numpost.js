@@ -7,12 +7,20 @@ const numPostTable = document.getElementById("numPostTable");
 const refreshMsg = document.getElementById('refreshMsg');
 
 showTableButton.addEventListener('click', toggleTable);
-refreshButton.addEventListener("click",displayNumPost);
+refreshButton.addEventListener("click",numpostRfrsh);
+
+async function numpostRfrsh(){
+    displayNumPost();
+    refreshMsg.textContent="Table refereshed";
+
+}
 
 
 //Function to show/hide table on click of showNumPost
 function toggleTable(){
     numPostTable.classList.toggle("hide-table");
+    refreshMsg.textContent="";
+
     
     if (numPostTable.classList.contains("hide-table")){
         showTableButton.textContent = "Show Table";
@@ -47,7 +55,6 @@ async function displayNumPost(){
             cell.textContent = field;
         })
     });
-    refreshMsg.textContent="Search successful!";
 }
 
 displayNumPost(); //Displays once onload
