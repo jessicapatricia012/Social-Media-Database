@@ -644,7 +644,7 @@ async function insertPost(event){
 // Initializes the webpage functionalities.
 // Add or remove event listeners based on the desired functionalities.
 window.onload = function () {
-    initializeAndInsertTables();
+    //initializeAndInsertTables();
     checkDbConnection();
     fetchTableData();
     document.getElementById("resetDatabaseButton").addEventListener("click", resetDatabase);
