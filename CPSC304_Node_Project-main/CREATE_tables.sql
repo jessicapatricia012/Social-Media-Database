@@ -40,7 +40,8 @@ CREATE TABLE EntryCreatedBy(
 	entryID NUMBER GENERATED AS IDENTITY PRIMARY KEY, 
 	dateCreated	DATE,
 	content	LONG,
-	username VARCHAR(50) REFERENCES Users(username)	ON DELETE CASCADE
+	username VARCHAR(50),
+	FOREIGN KEY (username) REFERENCES Users(username)	ON DELETE CASCADE
 );
 
 CREATE TABLE PostIn (
