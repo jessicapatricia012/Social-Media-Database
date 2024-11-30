@@ -21,6 +21,7 @@ CREATE TABLE Users (
 	email	VARCHAR(50)	NOT NULL,
 	displayName	VARCHAR(50),
 	dateJoined	DATE	NOT NULL,
+	FOREIGN KEY (dateJoined) REFERENCES UsersAge(dateJoined) ON DELETE CASCADE,
 	UNIQUE (email)
 );
 

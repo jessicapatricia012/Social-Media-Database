@@ -322,10 +322,10 @@ async function aggregateHaving() {
     console.log('aggregateHaving appservice'); 
     return await withOracleDB(async (connection) => {
         const result = await connection.execute(
-            `SELECT username, COUNT(awardType)
+            `SELECT username, COUNT(*)
             FROM GivenToBy
             GROUP BY username 
-            HAVING COUNT(awardType) >= 5`,
+            HAVING COUNT(*) >= 5`,
             [],
             { autoCommit: true }        
         );

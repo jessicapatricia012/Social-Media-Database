@@ -234,7 +234,7 @@ function configureListActions(sqlAction, li, optionText, selectedArray, multiSel
             formContainer.innerHTML = '';
 
             for (let table of selectedArray) {
-                generateForm(table, "projectRow", 'project');
+                generateProjectionForm(table, "projectRow", 'project');
             }
 
             break;
@@ -242,7 +242,109 @@ function configureListActions(sqlAction, li, optionText, selectedArray, multiSel
         default:
             console.error(`Unhandled sqlAction: ${sqlAction}`);
     }
+}
 
+const projectMsg = document.getElementById('projectMsg');
+function generateProjectionForm(option, tableName, sqlCommand) {
+    const formContainer = document.getElementById(tableName);
+    let submitButton = formContainer.querySelector('.submit-button');
+
+    if (!submitButton) {
+        submitButton = makeSubmitButton(tableName);
+    }
+
+    // Add a header to the form
+    const header = document.createElement('h2');
+    header.textContent = `${option}`;
+    formContainer.appendChild(header);
+
+    // Create a form element
+    const features = featuresMap[option] || [];
+    const form = document.createElement('form');
+    form.id = `${tableName}Form`;
+
+    features.forEach(feature => {
+        // Create a label and input for each feature
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.id = feature;
+        input.name = feature;
+
+        const label = document.createElement('label');
+        label.textContent = feature;
+        label.setAttribute('for', feature);
+
+        const div = document.createElement('div');
+        div.appendChild(input);
+        div.appendChild(label);
+
+        form.appendChild(div);
+    });
+
+    formContainer.appendChild(form);
+    //configure submit button
+    switch (sqlCommand) {
+        case 'project':
+            submitButton.addEventListener('click', async function (event) {
+                await performProjection(form, option);
+            });
+    }
+}
+
+// Gathers data in the form, performs projection, and updates html
+async function performProjection(form, option) {
+    clearTable("projectionTablesContainer");
+
+    // Collect form data into an array
+    const formData = [];
+    const formElements = form.elements;
+
+    for (let element of formElements) {
+        if (element.type == 'checkbox' && element.checked) {
+            formData.push({
+                name: element.name,
+                value: true
+            });
+        }
+    }
+
+    // Generate the query object
+    const query = generateProjectQuery(option, formData);
+
+    // Make the request to the server with query
+    try {
+        const response = await fetch(`/send/${query}`, { method: 'GET' });
+        const { data } = await response.json();
+        const filteredData = formData.filter(item => item.value !== null);
+        filteredData.sort((a, b) => Number(a.value) - Number(b.value));
+        const formDataWithoutValue = filteredData.map(({ value, ...rest }) => rest);
+        console.log("FORMDATAWITHOUTVALUE: ", formDataWithoutValue);
+
+        // update HTML
+        createTable(formDataWithoutValue, data, option, "projectionTablesContainer");
+        projectMsg.textContent = "Filter successful!";
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        projectMsg.textContent = "Error fetching data";
+    }
+
+}
+
+// Generates query for projection
+function generateProjectQuery(tableName, formData) {
+    // Filter out items with null values
+    const filteredData = formData.filter(item => item.value !== null);
+
+    // Sort the filtered data
+    filteredData.sort((a, b) => Number(a.value) - Number(b.value));
+
+    // Build the SQL SELECT query for projection
+    const columns = filteredData.map(item => item.name);
+    const query = `SELECT ${columns.join(', ')} FROM ${tableName}`;
+
+    console.log(query);
+
+    return query;
 }
 
 // Populate the dropdown
@@ -356,42 +458,7 @@ function generateForm(option, tableName, sqlCommand) {
 
 }
 
-// Gathers data in the form, performs projection, and updates html
-async function performProjection(form, option) {
-    clearTable("projectionTablesContainer");
 
-    // Collect form data into an array
-    const formData = [];
-    const formElements = form.elements;
-
-    for (let element of formElements) {
-        if (element.type !== 'submit' && element.type !== 'button') {
-            formData.push({
-                name: element.name,
-                value: element.value || null
-            });
-        }
-    }
-
-    // Generate the query object
-    const query = generateProjectQuery(option, formData);
-
-    // Make the request to the server with query
-    try {
-        const response = await fetch(`/send/${query}`, { method: 'GET' });
-        const { data } = await response.json();
-        const filteredData = formData.filter(item => item.value !== null);
-        filteredData.sort((a, b) => Number(a.value) - Number(b.value));
-        const formDataWithoutValue = filteredData.map(({ value, ...rest }) => rest);
-        console.log("FORMDATAWITHOUTVALUE: ", formDataWithoutValue);
-
-        // update HTML
-        createTable(formDataWithoutValue, data, option, "projectionTablesContainer");
-    } catch (err) {
-        console.error('Error fetching data:', err);
-    }
-
-}
 
 // Makes a query for join and sends it to oracle
 async function performJoin() {
@@ -438,22 +505,7 @@ document.getElementById('joinForm').addEventListener('submit', async function (e
     await performJoin();
 });
 
-// Generates query for projection
-function generateProjectQuery(tableName, formData) {
-    // Filter out items with null values
-    const filteredData = formData.filter(item => item.value !== null);
 
-    // Sort the filtered data
-    filteredData.sort((a, b) => Number(a.value) - Number(b.value));
-
-    // Build the SQL SELECT query for projection
-    const columns = filteredData.map(item => item.name);
-    const query = `SELECT ${columns.join(', ')} FROM ${tableName}`;
-
-    console.log(query);
-
-    return query;
-}
 
 // Generates query for join
 function generateJoinQuery(selectedAttributes) {
