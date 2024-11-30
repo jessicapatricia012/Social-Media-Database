@@ -25,7 +25,7 @@ async function checkDbConnection() {
 // Initializes database and inserts starting values
 async function initializeAndInsertTables() {
     await initializeTables();
-    await insertTables();
+    //await insertTables();
 }
 
 // This function initializes tables stated in CREATE_tables.sql
